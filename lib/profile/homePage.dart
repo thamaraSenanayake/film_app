@@ -14,12 +14,11 @@ class HomePage extends StatefulWidget {
 }
 
 final List<String> imgList = [
-  'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
-  'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
-  'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-  'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
+  'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',
+  'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',
+  'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',
+  'https://lh3.googleusercontent.com/proxy/hSVs5mgqrBEzyLO5mhxTMfGzZmoeqtvBmpCmUIE7Gt7JdFV5ZNlSP1GVqjPaNP5CoTofjtNG_L08NioAto1ipMQoddDO6XmSRr27FX6f0XDnMq5w',
+  'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',
 ];
 class _HomePageState extends State<HomePage> {
   double _height = 0.0;
@@ -373,6 +372,74 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Container(
                             height: _height,
+                            width: _width,
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(height: 20,),
+                                Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                  // color: Colors.amber,
+                                  child: GridView.count(
+                                    primary: false,
+                                    // padding: const EdgeInsets.all(20),
+                                    crossAxisSpacing: 0,
+                                    mainAxisSpacing: 0,
+                                    crossAxisCount: 2,
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        child: Center(
+                                          child: Container(
+                                            width: 110,
+                                            child: Text(
+                                              "Recently View",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 30,
+                                                color: Colors.white
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        // color: Colors.teal[100],
+                                      ),
+                                      Container(
+                                        child: Image.network(
+                                          'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',
+                                          fit: BoxFit.cover,
+                                        ),
+                                        // color: Colors.teal[200],
+                                      ),
+                                      Container(//
+                                        child: Image.network(
+                                          'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Image.network(
+                                          'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Image.network(
+                                          'https://lh3.googleusercontent.com/proxy/hSVs5mgqrBEzyLO5mhxTMfGzZmoeqtvBmpCmUIE7Gt7JdFV5ZNlSP1GVqjPaNP5CoTofjtNG_L08NioAto1ipMQoddDO6XmSRr27FX6f0XDnMq5w',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Image.network(
+                                          'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
                           )
                         ],
                       ),
