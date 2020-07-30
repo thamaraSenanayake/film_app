@@ -1,9 +1,14 @@
 import 'dart:async';
 
 import 'package:film_app/const.dart';
+import 'package:film_app/model/film.dart';
+import 'package:film_app/module/gridItem/girditemListner.dart';
+import 'package:film_app/module/gridItem/gridItem.dart';
+import 'package:film_app/module/gridItem/gridTitle.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -17,10 +22,10 @@ final List<String> imgList = [
   'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',
   'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',
   'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',
-  'https://lh3.googleusercontent.com/proxy/hSVs5mgqrBEzyLO5mhxTMfGzZmoeqtvBmpCmUIE7Gt7JdFV5ZNlSP1GVqjPaNP5CoTofjtNG_L08NioAto1ipMQoddDO6XmSRr27FX6f0XDnMq5w',
+  'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',
   'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',
 ];
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> implements GridItemListner{
   double _height = 0.0;
   double _width = 0.0;
   double _top = 0.0;
@@ -28,6 +33,14 @@ class _HomePageState extends State<HomePage> {
   Timer timer;
   ScrollController _controller;
   bool _onTop = true;
+  
+  bool _recentViewFilms = false;
+  bool _newlyAddedFilms = false;
+  bool _englishFilms = false;
+  bool _hindiFilms = false;
+  bool _tamilFilms = false;
+  bool _koreanFilms = false;
+
  
   @override
   void initState() {
@@ -46,18 +59,36 @@ class _HomePageState extends State<HomePage> {
         _onTop = true;
       });
     }
-    else if(_controller.position.pixels > 40 && _onTop && ScrollDirection.reverse == _controller.position.userScrollDirection ){
-      _controller.animateTo(_height - 100,duration: Duration(milliseconds: 500), curve: Curves.linear);
-      setState(() {
-        _onTop = false;
-      });
+    if(ScrollDirection.reverse == _controller.position.userScrollDirection ){
+      if(_controller.position.pixels > (_height - 100)*2+40 && !_englishFilms){
+        _controller.animateTo((_height - 100)*3,duration: Duration(milliseconds: 500), curve: Curves.linear);
+        setState(() {
+          _englishFilms = true;
+        });
+      }
+      else if(_controller.position.pixels > _height + 40 &&!_newlyAddedFilms ){
+        _controller.animateTo((_height - 100)*2,duration: Duration(milliseconds: 500), curve: Curves.linear);
+        setState(() {
+          _newlyAddedFilms = true;
+        });
+      }
+      else if(_controller.position.pixels > 40 && _onTop ){
+        _controller.animateTo(_height - 100,duration: Duration(milliseconds: 500), curve: Curves.linear);
+        setState(() {
+          _onTop = false;
+          _recentViewFilms = true;
+        });
+      }
+    }else{
+      if(_controller.position.pixels < _height -40 && !_onTop ){
+        _controller.animateTo(0,duration: Duration(milliseconds: 500), curve: Curves.linear);
+        setState(() {
+          _onTop = true;
+          // _recentViewFilms = false;
+        });
+      }
     }
-    else if(_controller.position.pixels < _height -40 && !_onTop && ScrollDirection.forward == _controller.position.userScrollDirection ){
-      _controller.animateTo(0,duration: Duration(milliseconds: 500), curve: Curves.linear);
-      setState(() {
-        _onTop = true;
-      });
-    }
+
   }
 
   _loadSlider(){
@@ -98,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal:10.0),
+                        padding: const EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -259,185 +290,274 @@ class _HomePageState extends State<HomePage> {
                               items: _imageList,
                             ),
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
+
+                          //recently view films
                           Container(
-                            height: 50,
+                            height: _height-100,
                             width: _width,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:0.0),
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(right:8.0),
-                                    child: Container(
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(3)
-                                        ),
-                                        color: Colors.white
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "English",
-                                            style:TextStyle(
-                                              color: ColorList.Black,
-                                              fontSize: 15
-                                            )
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right:8.0),
-                                    child: Container(
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(3)
-                                        ),
-                                        color: Colors.white
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Hindi",
-                                            style:TextStyle(
-                                              color: ColorList.Black,
-                                              fontSize: 15
-                                            )
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right:8.0),
-                                    child: Container(
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(3)
-                                        ),
-                                        color: Colors.white
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Tamil",
-                                            style:TextStyle(
-                                              color: ColorList.Black,
-                                              fontSize: 15
-                                            )
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right:8.0),
-                                    child: Container(
-                                      width: 100,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(3)
-                                        ),
-                                        color: Colors.white
-                                      ),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Korean",
-                                            style:TextStyle(
-                                              color: ColorList.Black,
-                                              fontSize: 15
-                                            )
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: _height,
-                            width: _width,
+                            // color: Colors.amber,
                             child: Column(
                               children: <Widget>[
-                                SizedBox(height: 20,),
+                                SizedBox(
+                                  height: 20,
+                                ),
                                 Container(
+                                  height: 50,
                                   width: _width,
-                                  height: _width*1.5,
-                                  // color: Colors.amber,
-                                  child: GridView.count(
-                                    primary: false,
-                                    // padding: const EdgeInsets.all(20),
-                                    crossAxisSpacing: 0,
-                                    mainAxisSpacing: 0,
-                                    crossAxisCount: 2,
-                                    children: <Widget>[
-                                      Container(
-                                        padding: EdgeInsets.all(8),
-                                        child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal:0.0),
+                                    child: ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.only(right:8.0),
                                           child: Container(
-                                            width: 110,
-                                            child: Text(
-                                              "Recently View",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 30,
-                                                color: Colors.white
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(3)
+                                              ),
+                                              color: Colors.white
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "English",
+                                                  style:TextStyle(
+                                                    color: ColorList.Black,
+                                                    fontSize: 15
+                                                  )
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        // color: Colors.teal[100],
-                                      ),
-                                      Container(
-                                        child: Image.network(
-                                          'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',
-                                          fit: BoxFit.cover,
+                                        Padding(
+                                          padding: const EdgeInsets.only(right:8.0),
+                                          child: Container(
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(3)
+                                              ),
+                                              color: Colors.white
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Hindi",
+                                                  style:TextStyle(
+                                                    color: ColorList.Black,
+                                                    fontSize: 15
+                                                  )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                        // color: Colors.teal[200],
-                                      ),
-                                      Container(//
-                                        child: Image.network(
-                                          'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',
-                                          fit: BoxFit.cover,
+                                        Padding(
+                                          padding: const EdgeInsets.only(right:8.0),
+                                          child: Container(
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(3)
+                                              ),
+                                              color: Colors.white
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Tamil",
+                                                  style:TextStyle(
+                                                    color: ColorList.Black,
+                                                    fontSize: 15
+                                                  )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      Container(
-                                        child: Image.network(
-                                          'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Image.network(
-                                          'https://lh3.googleusercontent.com/proxy/hSVs5mgqrBEzyLO5mhxTMfGzZmoeqtvBmpCmUIE7Gt7JdFV5ZNlSP1GVqjPaNP5CoTofjtNG_L08NioAto1ipMQoddDO6XmSRr27FX6f0XDnMq5w',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Image.network(
-                                          'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ],
+                                        Padding(
+                                          padding: const EdgeInsets.only(right:8.0),
+                                          child: Container(
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(3)
+                                              ),
+                                              color: Colors.white
+                                            ),
+                                            child: Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Korean",
+                                                  style:TextStyle(
+                                                    color: ColorList.Black,
+                                                    fontSize: 15
+                                                  )
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                )
+                                ),
+                                SizedBox(height: 20,),
+                                _recentViewFilms?Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                  // color: Colors.amber,
+                                  child: AnimationLimiter(
+                                    child: GridView.count(
+                                      primary: false,
+                                      // padding: const EdgeInsets.all(20),
+                                      crossAxisSpacing: 0,
+                                      mainAxisSpacing: 0,
+                                      crossAxisCount: 2,
+                                      children: <Widget>[
+                                        GridHeader(title: "Recently Viewed Films",index: 0,),
+                                        GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg'), gridItemListner: this, index: 1),
+                                        GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png'), gridItemListner: this, index: 2),
+                                        GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg'), gridItemListner: this, index: 3),
+                                        GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690'), gridItemListner: this, index: 4),
+                                        GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg'), gridItemListner: this, index: 5)
+                                      ],
+                                    ),
+                                  ),
+                                ):
+                                Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                ),
+                                SizedBox(height: 20,),
+                              ],
+                            ),
+                          ),
+
+                          //newly added films
+                          Container(
+                            height: _height-100,
+                            width: _width,
+                            // color: Colors.amber,
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                _newlyAddedFilms?Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                  // color: Colors.amber,
+                                  child: AnimationLimiter(
+                                    child: GridView.count(
+                                      primary: false,
+                                      // padding: const EdgeInsets.all(20),
+                                      crossAxisSpacing: 0,
+                                      mainAxisSpacing: 0,
+                                      crossAxisCount: 2,
+                                      children: <Widget>[
+                                        GridHeader(title: "Newly Added Films",index: 0,),
+                                        GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg'), gridItemListner: this, index: 1),
+                                        GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png'), gridItemListner: this, index: 2),
+                                        GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg'), gridItemListner: this, index: 3),
+                                        GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690'), gridItemListner: this, index: 4),
+                                        GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg'), gridItemListner: this, index: 5)
+                                      ],
+                                    ),
+                                  ),
+                                ):
+                                Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                ),
+                                SizedBox(height: 20,),
+                              ],
+                            ),
+                          ),
+
+                          //english films
+                          Container(
+                            height: _height-100,
+                            width: _width,
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                _englishFilms?Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                  // color: Colors.amber,
+                                  child: AnimationLimiter(
+                                    child: GridView.count(
+                                      primary: false,
+                                      // padding: const EdgeInsets.all(20),
+                                      crossAxisSpacing: 0,
+                                      mainAxisSpacing: 0,
+                                      crossAxisCount: 2,
+                                      children: <Widget>[
+                                        GridHeader(title: "English Films",index: 0,),
+                                        GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg'), gridItemListner: this, index: 1),
+                                        GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png'), gridItemListner: this, index: 2),
+                                        GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg'), gridItemListner: this, index: 3),
+                                        GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690'), gridItemListner: this, index: 4),
+                                        GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg'), gridItemListner: this, index: 5)
+                                      ],
+                                    ),
+                                  ),
+                                ):
+                                Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                ),
+                                SizedBox(height: 20,),
+                              ],
+                            ),
+                          ),
+
+                          //Hindi films
+                          Container(
+                            height: _height-100,
+                            width: _width,
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                _hindiFilms?Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                  // color: Colors.amber,
+                                  child: AnimationLimiter(
+                                    child: GridView.count(
+                                      primary: false,
+                                      // padding: const EdgeInsets.all(20),
+                                      crossAxisSpacing: 0,
+                                      mainAxisSpacing: 0,
+                                      crossAxisCount: 2,
+                                      children: <Widget>[
+                                        GridHeader(title: "Hindi Films",index: 0,),
+                                        GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg'), gridItemListner: this, index: 1),
+                                        GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png'), gridItemListner: this, index: 2),
+                                        GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg'), gridItemListner: this, index: 3),
+                                        GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690'), gridItemListner: this, index: 4),
+                                        GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg'), gridItemListner: this, index: 5)
+                                      ],
+                                    ),
+                                  ),
+                                ):
+                                Container(
+                                  width: _width,
+                                  height: _width*1.5,
+                                ),
+                                SizedBox(height: 20,),
                               ],
                             ),
                           )
@@ -483,7 +603,9 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
-class ColoList {
+  @override
+  gridItemListner(Film film) {
+    
+  }
 }
