@@ -21,18 +21,40 @@ class _GridHeaderState extends State<GridHeader> {
         child: FadeInAnimation(
           child: Container(
             padding: EdgeInsets.all(8),
-            child: Center(
-              child: Container(
-                // width: 110,
-                child: Text(
-                  widget.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.white
+            child: Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    // width: 110,
+                    child: Text(
+                      widget.title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.white
+                      ),
+                    ),
+                    
                   ),
                 ),
-              ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    // width: 110,
+                    child: Text(
+                      "See All",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.red,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    
+                  ),
+                )
+              ],
             ),
             // color: Colors.teal[100],
           ),

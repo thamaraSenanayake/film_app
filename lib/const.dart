@@ -5,3 +5,12 @@ class ColorList{
   static const Red = Color(0xffed092c);
   static const Green = Color(0xff2ced09);
 }
+
+enum FilmListCategery{
+  RecentlyView,
+  NewlyAdd,
+  English,
+  Tamil,
+  Korean,
+  Hindi
+}
