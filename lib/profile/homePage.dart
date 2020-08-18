@@ -32,8 +32,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   double _height = 0.0;
   double _width = 0.0;
   double _top = 0.0;
+  int filmLength = 0;
   double _pageHeight = 0.0;
   List<Widget> _imageList = [];
+  List<Widget> _recentFilmsList = [];
+  List<Widget> _newFilmsList = [];
+  List<Widget> _englishFilmsList = [];
+  List<Widget> _hindiFilmsList = [];
+  List<Widget> _tamilFilmsList = [];
+  List<Widget> _koreanFilmsList = [];
+  
+
   Timer timer;
   ScrollController _controller;
   bool _onTop = true;
@@ -48,6 +57,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   FancyDrawerController _fancyController;
   final _searchController = TextEditingController();
+
+  List<Film> _filmList = [
+    Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
+    Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
+    Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
+    Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
+    Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
+  ];
 
 
  
@@ -64,6 +81,89 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _controller.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_)  {
       _loadSlider();
+      _loadFilms();
+    });
+  }
+
+  _loadFilms(){
+    List<Widget> _recentFilmsListTemp = [];
+    List<Widget> _newFilmsListTemp = [];
+    List<Widget> _englishFilmsListTemp = [];
+    List<Widget> _hindiFilmsListTemp = [];
+    List<Widget> _tamilFilmsListTemp = [];
+    List<Widget> _koreanFilmsListTemp = [];
+    
+    if(_height - 210< _width*1.5){
+      setState(() {
+        filmLength = 3;
+      });
+    }else{
+      setState(() {
+        filmLength = 5;
+      });
+    }
+
+    _recentFilmsListTemp.add(GridHeader(title: "Recently Viewed Films",index: 0,));
+    _newFilmsListTemp.add(GridHeader(title: "Newly Added Films",index: 0,));
+    _englishFilmsListTemp.add(GridHeader(title: "English Films",index: 0,));
+    _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,));
+    _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,));
+    _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,));
+
+    for (var i = 0; i < filmLength; i++) {
+      print("run");
+      _recentFilmsListTemp.add(
+        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
+      );
+    } 
+    for (var i = 0; i < filmLength; i++) {
+      _newFilmsListTemp.add(
+        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
+      );
+    } 
+    for (var i = 0; i < filmLength; i++) {
+      _englishFilmsListTemp.add(
+        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
+      );
+    } 
+    for (var i = 0; i < filmLength; i++) {
+      _hindiFilmsListTemp.add(
+        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
+      );
+    } 
+    for (var i = 0; i < filmLength; i++) {
+      _tamilFilmsListTemp.add(
+        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
+      );
+    } 
+    for (var i = 0; i < filmLength; i++) {
+      _koreanFilmsListTemp.add(
+        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
+      );
+    } 
+
+    print(_recentFilmsListTemp.length);
+    print(_newFilmsListTemp.length);
+    print(_englishFilmsListTemp.length);
+    print(_hindiFilmsListTemp.length);
+    print(_tamilFilmsListTemp.length);
+    print(_koreanFilmsListTemp.length);
+
+    setState(() {
+      _recentFilmsList =  _recentFilmsListTemp;
+      _newFilmsList =  _newFilmsListTemp;
+      _englishFilmsList =  _englishFilmsListTemp;
+      _hindiFilmsList =  _hindiFilmsListTemp;
+      _tamilFilmsList =  _tamilFilmsListTemp;
+      _koreanFilmsList =  _koreanFilmsListTemp;
+    });
+  }
+
+  _goDownButtonClick(){
+    _controller.jumpTo(_pageHeight);
+    setState(() {
+      _onTop = false;
+      _recentViewFilms = true;
     });
   }
 
@@ -120,35 +220,35 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           _recentViewFilms = false;
         });
       }
-      else if(_controller.position.pixels < _pageHeight*2 -40 && !_onTop ){
+      else if(_controller.position.pixels < _pageHeight*2 -40 && _newlyAddedFilms ){
         print(2);
         _controller.animateTo(_pageHeight,duration: Duration(milliseconds: 300), curve: Curves.linear);
         setState(() {
           _newlyAddedFilms = false;
         });
       }
-      else if(_controller.position.pixels < _pageHeight*3 -40 && !_onTop ){
+      else if(_controller.position.pixels < _pageHeight*3 -40 && _englishFilms ){
         print(3);
         _controller.animateTo(_pageHeight*2,duration: Duration(milliseconds: 300), curve: Curves.linear);
         setState(() {
           _englishFilms = false;
         });
       }
-      else if(_controller.position.pixels < _pageHeight*4 -40 && !_onTop ){
+      else if(_controller.position.pixels < _pageHeight*4 -40 && _hindiFilms ){
         print(4);
         _controller.animateTo(_pageHeight*3,duration: Duration(milliseconds: 300), curve: Curves.linear);
         setState(() {
           _hindiFilms = false;
         });
       }
-      else if(_controller.position.pixels < _pageHeight*5 -40 && !_onTop ){
+      else if(_controller.position.pixels < _pageHeight*5 -40 && _tamilFilms ){
         print(5);
         _controller.animateTo(_pageHeight*4,duration: Duration(milliseconds: 300), curve: Curves.linear);
         setState(() {
           _tamilFilms = false;
         });
       }
-      else if(_controller.position.pixels < _pageHeight*6 -40 && !_onTop ){
+      else if(_controller.position.pixels < _pageHeight*6 -40 && _koreanFilms ){
         print(5);
         _controller.animateTo(_pageHeight*5,duration: Duration(milliseconds: 300), curve: Curves.linear);
         setState(() {
@@ -481,35 +581,69 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           blurRadius: 2.0,
                                           spreadRadius: -2.0, 
                                           offset: Offset(
-                                            1.0,
+                                            2.0,
                                             2.0,
                                           ),
                                         )
                                       ],
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal:20.0),
-                                      child: TextField(
-                                        style: TextStyle(color: Colors.black, fontSize: 15),
-                                        controller: _searchController,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: "Search...",
-                                          hintStyle: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xffB3A9A9),
-                                            height: 1.8
+                                    child: Row(
+                                      children: <Widget>[
+                                        Container(
+                                          width: _width-110,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal:20.0),
+                                            child: TextField(
+                                              style: TextStyle(color: Colors.black, fontSize: 15),
+                                              controller: _searchController,
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                hintText: "Search...",
+                                                hintStyle: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xffB3A9A9),
+                                                  height: 1.8
+                                                ),
+                                              ),
+                                              keyboardType: TextInputType.text,
+                                              onChanged: (value){
+                                                // _englishtitleErrorRemove();
+                                              },
+                                              onSubmitted: (value){
+                                                _search();
+                                              },
+                                            ),
                                           ),
                                         ),
-                                        keyboardType: TextInputType.text,
-                                        onChanged: (value){
-                                          // _englishtitleErrorRemove();
-                                        },
-                                        onSubmitted: (value){
-                                          _search();
-                                        },
-                                      ),
+                                        GestureDetector(
+                                          onTap: (){
+                                            _search();
+                                          },
+                                          child: Container(
+                                            width: 100,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              color: ColorList.Black,
+                                              borderRadius: BorderRadius.only(
+                                                topRight: Radius.circular(3),
+                                                bottomRight: Radius.circular(3),
+                                              )
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                "Search",
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w700,
+                                                  height: 1.8,
+                                                  color: Colors.white
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -566,7 +700,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 Container(
                                   height: _height-100,
                                   width: _width,
-                                  // color: Colors.amber,
+                                  // color: Colors.red,
                                   child: Column(
                                     children: <Widget>[
                                       SizedBox(
@@ -695,6 +829,42 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                     Navigator.of(context).push(
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
+                                                          filmListCategery: FilmListCategery.Telugu,
+                                                        ),
+                                                        opaque: false
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 100,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.all(
+                                                        Radius.circular(3)
+                                                      ),
+                                                      color: Colors.white
+                                                    ),
+                                                    child: Center(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text(
+                                                          "Telugu",
+                                                          style:TextStyle(
+                                                            color: ColorList.Black,
+                                                            fontSize: 15
+                                                          )
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right:8.0),
+                                                child: GestureDetector(
+                                                  onTap: (){
+                                                    Navigator.of(context).push(
+                                                      PageRouteBuilder(
+                                                        pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.Korean,
                                                         ),
                                                         opaque: false
@@ -723,7 +893,79 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                     ),
                                                   ),
                                                 ),
-                                              )
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right:8.0),
+                                                child: GestureDetector(
+                                                  onTap: (){
+                                                    Navigator.of(context).push(
+                                                      PageRouteBuilder(
+                                                        pageBuilder: (context, _, __) => FilmList(
+                                                          filmListCategery: FilmListCategery.TvSerices,
+                                                        ),
+                                                        opaque: false
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 100,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.all(
+                                                        Radius.circular(3)
+                                                      ),
+                                                      color: Colors.white
+                                                    ),
+                                                    child: Center(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text(
+                                                          "TV serices",
+                                                          style:TextStyle(
+                                                            color: ColorList.Black,
+                                                            fontSize: 15
+                                                          )
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right:8.0),
+                                                child: GestureDetector(
+                                                  onTap: (){
+                                                    Navigator.of(context).push(
+                                                      PageRouteBuilder(
+                                                        pageBuilder: (context, _, __) => FilmList(
+                                                          filmListCategery: FilmListCategery.Other,
+                                                        ),
+                                                        opaque: false
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 100,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.all(
+                                                        Radius.circular(3)
+                                                      ),
+                                                      color: Colors.white
+                                                    ),
+                                                    child: Center(
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(8.0),
+                                                        child: Text(
+                                                          "Other",
+                                                          style:TextStyle(
+                                                            color: ColorList.Black,
+                                                            fontSize: 15
+                                                          )
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -731,7 +973,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       SizedBox(height: 20,),
                                       _recentViewFilms?Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        // height: _height-210,
+                                        height:_height -210,
                                         // color: Colors.amber,
                                         child: AnimationLimiter(
                                           child: GridView.count(
@@ -740,20 +983,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: <Widget>[
-                                              GridHeader(title: "Recently Viewed Films",index: 0,),
-                                              GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                                              GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                                              GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                                              GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                                              GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
-                                            ],
+                                            children:_recentFilmsList
+                                            
                                           ),
                                         ),
                                       ):
                                       Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height-210,
                                       ),
                                       SizedBox(height: 20,),
                                     ],
@@ -772,7 +1009,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                       _newlyAddedFilms?Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                         // color: Colors.amber,
                                         child: AnimationLimiter(
                                           child: GridView.count(
@@ -781,20 +1018,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: <Widget>[
-                                              GridHeader(title: "Newly Added Films",index: 0,),
-                                              GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                                              GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                                              GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                                              GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                                              GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
-                                            ],
+                                            children: _newFilmsList,
                                           ),
                                         ),
                                       ):
                                       Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                       ),
                                       SizedBox(height: 20,),
                                     ],
@@ -812,7 +1042,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                       _englishFilms?Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                         // color: Colors.amber,
                                         child: AnimationLimiter(
                                           child: GridView.count(
@@ -821,20 +1051,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: <Widget>[
-                                              GridHeader(title: "English Films",index: 0,),
-                                              GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                                              GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                                              GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                                              GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                                              GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
-                                            ],
+                                            children: _englishFilmsList,
                                           ),
                                         ),
                                       ):
                                       Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                       ),
                                       SizedBox(height: 20,),
                                     ],
@@ -852,7 +1075,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                       _hindiFilms?Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                         // color: Colors.amber,
                                         child: AnimationLimiter(
                                           child: GridView.count(
@@ -861,20 +1084,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: <Widget>[
-                                              GridHeader(title: "Hindi Films",index: 0,),
-                                              GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                                              GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                                              GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                                              GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                                              GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
-                                            ],
+                                            children: _hindiFilmsList,
                                           ),
                                         ),
                                       ):
                                       Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                       ),
                                       SizedBox(height: 20,),
                                     ],
@@ -892,7 +1108,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                       _tamilFilms?Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                         // color: Colors.amber,
                                         child: AnimationLimiter(
                                           child: GridView.count(
@@ -901,20 +1117,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: <Widget>[
-                                              GridHeader(title: "Tamil Films",index: 0,),
-                                              GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                                              GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                                              GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                                              GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                                              GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
-                                            ],
+                                            children:_tamilFilmsList,
                                           ),
                                         ),
                                       ):
                                       Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                       ),
                                       SizedBox(height: 20,),
                                     ],
@@ -932,7 +1141,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       ),
                                       _koreanFilms?Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                         // color: Colors.amber,
                                         child: AnimationLimiter(
                                           child: GridView.count(
@@ -941,20 +1150,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: <Widget>[
-                                              GridHeader(title: "Korean Films",index: 0,),
-                                              GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                                              GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                                              GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                                              GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                                              GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
-                                            ],
+                                            children: _koreanFilmsList,
                                           ),
                                         ),
                                       ):
                                       Container(
                                         width: _width,
-                                        height: _width*1.5,
+                                        height: _height -210,
                                       ),
                                       SizedBox(height: 20,),
                                     ],
@@ -975,26 +1177,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   top:_top,
                   right: 10,
                   duration: Duration(seconds: 1),
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      color: ColorList.Red,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 1.0,
-                          spreadRadius: -2.0, 
-                          offset: Offset(
-                            1.0,
-                            2.0,
-                          ),
-                        )
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.arrow_downward
+                  child: GestureDetector(
+                    onTap: (){
+                      _goDownButtonClick();
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: ColorList.Red,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 1.0,
+                            spreadRadius: -2.0, 
+                            offset: Offset(
+                              1.0,
+                              2.0,
+                            ),
+                          )
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.arrow_downward
+                      ),
                     ),
                   ),
                 ):Container()

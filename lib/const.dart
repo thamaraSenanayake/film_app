@@ -10,7 +10,18 @@ enum FilmListCategery{
   RecentlyView,
   NewlyAdd,
   English,
-  Tamil,
+  Telugu,
   Korean,
-  Hindi
+  Hindi,
+  TvSerices,
+  Other,
+  Tamil
+}
+
+enum FilmGenaricList{
+  Action,
+  Advenure,
+  Horror,
+  Crime,
+  All
 }

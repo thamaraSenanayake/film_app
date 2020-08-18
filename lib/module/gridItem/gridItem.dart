@@ -61,7 +61,7 @@ class _GridItemState extends State<GridItem> {
                         )
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 2),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,

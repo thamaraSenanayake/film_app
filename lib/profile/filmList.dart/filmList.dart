@@ -19,7 +19,18 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
   double _height = 0.0;
   double _width = 0.0;
   bool _genaricDisplay = false;
+  bool _showSearchText = false;
   String _title = "";
+  final _searchController = TextEditingController();
+  FilmGenaricList filmGenaricList = FilmGenaricList.All;
+
+  _search(){
+    setState(() {
+      _showSearchText = false;
+    });
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +110,110 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                   ),
 
                   Padding(
+                    padding: const EdgeInsets.only(bottom:10.0,right: 15),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            _showSearchText = true;
+                          });
+                        },
+                        child: Container(
+                          child: Icon(
+                            Icons.search,
+                            color: ColorList.Black,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  _showSearchText? Padding(
+                    padding: const EdgeInsets.only(bottom:10.0),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: _width -10,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(3)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey,
+                              blurRadius: 2.0,
+                              spreadRadius: -2.0, 
+                              offset: Offset(
+                                2.0,
+                                2.0,
+                              ),
+                            )
+                          ],
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: _width-110,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal:20.0),
+                                child: TextField(
+                                  style: TextStyle(color: Colors.black, fontSize: 15),
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Search...",
+                                    hintStyle: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xffB3A9A9),
+                                      height: 1.8
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.text,
+                                  onChanged: (value){
+                                    // _englishtitleErrorRemove();
+                                  },
+                                  onSubmitted: (value){
+                                    _search();
+                                  },
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: (){
+                                _search();
+                              },
+                              child: Container(
+                                width: 100,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: ColorList.Black,
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(3),
+                                    bottomRight: Radius.circular(3),
+                                  )
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Search",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.8,
+                                      color: Colors.white
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ):Container(),
+
+                  Padding(
                     padding: const EdgeInsets.only(bottom:10.0),
                     child: Align(
                       alignment: Alignment.bottomCenter,
@@ -143,14 +258,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                               padding: const EdgeInsets.only(right:8.0),
                               child: GestureDetector(
                                 onTap: (){
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, _, __) => FilmList(
-                                        filmListCategery: FilmListCategery.English,
-                                      ),
-                                      opaque: false
-                                    ),
-                                  );
+                                  setState(() {
+                                    filmGenaricList = FilmGenaricList.All;
+                                  });
                                 },
                                 child: Container(
                                   width: 100,
@@ -158,7 +268,38 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(3)
                                     ),
-                                    color: Colors.white
+                                    color: filmGenaricList == FilmGenaricList.All? ColorList.Red:Colors.white
+                                  ),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "All",
+                                        style:TextStyle(
+                                          color: filmGenaricList == FilmGenaricList.All? Colors.white:ColorList.Black,
+                                          fontSize: 15
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right:8.0),
+                              child: GestureDetector(
+                                onTap: (){
+                                  setState(() {
+                                    filmGenaricList = FilmGenaricList.Action;
+                                  });
+                                },
+                                child: Container(
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(3)
+                                    ),
+                                    color: filmGenaricList == FilmGenaricList.Action? ColorList.Red:Colors.white
                                   ),
                                   child: Center(
                                     child: Padding(
@@ -166,7 +307,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                       child: Text(
                                         "Action",
                                         style:TextStyle(
-                                          color: ColorList.Black,
+                                          color: filmGenaricList == FilmGenaricList.Action? Colors.white:ColorList.Black,
                                           fontSize: 15
                                         )
                                       ),
@@ -179,14 +320,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                               padding: const EdgeInsets.only(right:8.0),
                               child: GestureDetector(
                                 onTap: (){
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, _, __) => FilmList(
-                                        filmListCategery: FilmListCategery.Hindi,
-                                      ),
-                                      opaque: false
-                                    ),
-                                  );
+                                  setState(() {
+                                    filmGenaricList = FilmGenaricList.Advenure;
+                                  });
                                 },
                                 child: Container(
                                   width: 100,
@@ -194,7 +330,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(3)
                                     ),
-                                    color: Colors.white
+                                    color: filmGenaricList == FilmGenaricList.Advenure? ColorList.Red:Colors.white
                                   ),
                                   child: Center(
                                     child: Padding(
@@ -202,7 +338,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                       child: Text(
                                         "Adventure",
                                         style:TextStyle(
-                                          color: ColorList.Black,
+                                          color: filmGenaricList == FilmGenaricList.Advenure? Colors.white:ColorList.Black,
                                           fontSize: 15
                                         )
                                       ),
@@ -215,14 +351,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                               padding: const EdgeInsets.only(right:8.0),
                               child: GestureDetector(
                                 onTap: (){
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, _, __) => FilmList(
-                                        filmListCategery: FilmListCategery.Tamil,
-                                      ),
-                                      opaque: false
-                                    ),
-                                  );
+                                  setState(() {
+                                    filmGenaricList = FilmGenaricList.Horror;
+                                  });
                                 },
                                 child: Container(
                                   width: 100,
@@ -230,7 +361,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(3)
                                     ),
-                                    color: Colors.white
+                                    color: filmGenaricList == FilmGenaricList.Horror? ColorList.Red:Colors.white
                                   ),
                                   child: Center(
                                     child: Padding(
@@ -238,7 +369,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                       child: Text(
                                         "Horror",
                                         style:TextStyle(
-                                          color: ColorList.Black,
+                                          color: filmGenaricList == FilmGenaricList.Horror? Colors.white:ColorList.Black,
                                           fontSize: 15
                                         )
                                       ),
@@ -251,14 +382,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                               padding: const EdgeInsets.only(right:8.0),
                               child: GestureDetector(
                                 onTap: (){
-                                  Navigator.of(context).push(
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, _, __) => FilmList(
-                                        filmListCategery: FilmListCategery.Korean,
-                                      ),
-                                      opaque: false
-                                    ),
-                                  );
+                                  setState(() {
+                                    filmGenaricList = FilmGenaricList.Crime;
+                                  });
                                 },
                                 child: Container(
                                   width: 100,
@@ -266,7 +392,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(3)
                                     ),
-                                    color: Colors.white
+                                    color: filmGenaricList == FilmGenaricList.Crime? ColorList.Red:Colors.white
                                   ),
                                   child: Center(
                                     child: Padding(
@@ -274,7 +400,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                       child: Text(
                                         "Crime",
                                         style:TextStyle(
-                                          color: ColorList.Black,
+                                          color: filmGenaricList == FilmGenaricList.Crime? Colors.white:ColorList.Black,
                                           fontSize: 15
                                         )
                                       ),
