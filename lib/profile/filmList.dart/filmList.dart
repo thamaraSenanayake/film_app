@@ -426,12 +426,12 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                           mainAxisSpacing: 0,
                           crossAxisCount: 2,
                           children: <Widget>[
-                            GridItem(film: Film(imgUrl:'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/62077a91502251.5e332b479a8d3.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 0),
-                            GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 1),
-                            GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 2),
-                            GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 3),
-                            GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 4),
-                            GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"), gridItemListner: this, index: 5)
+                            GridItem(film: Film(imgUrl:'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/62077a91502251.5e332b479a8d3.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 0),
+                            GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 1),
+                            GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 2),
+                            GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 3),
+                            GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 4),
+                            GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 5)
                           ],
                         ),
                       ),

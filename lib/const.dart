@@ -6,6 +6,10 @@ class ColorList{
   static const Green = Color(0xff2ced09);
 }
 
+class KeyContainer {
+  static const String HINTDISPLAY = 'hint';
+}
+
 enum FilmListCategery{
   RecentlyView,
   NewlyAdd,
@@ -23,5 +27,9 @@ enum FilmGenaricList{
   Advenure,
   Horror,
   Crime,
+  Comedy,
+  Family,
+  Drama,
+  Bio,
   All
 }

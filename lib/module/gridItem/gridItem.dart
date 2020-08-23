@@ -1,5 +1,6 @@
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
+import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
@@ -77,7 +78,7 @@ class _GridItemState extends State<GridItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Text(
-                                  widget.film.genaric,
+                                  filmGenaricToString(widget.film.genaric),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15

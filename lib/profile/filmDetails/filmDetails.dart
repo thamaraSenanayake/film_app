@@ -2,6 +2,7 @@ import 'package:film_app/model/comment.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/comment/commetView.dart';
 import 'package:film_app/module/relatedMovie/relatedMovieItem.dart';
+import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -24,18 +25,20 @@ class _FilmDeatilsState extends State<FilmDeatils> {
   List<Widget> _relatedFilmList = [];
   List<Comment> _commentList = [];
   final _commentController = TextEditingController();
+  
 
-  YoutubePlayerController _controller = YoutubePlayerController(
-      initialVideoId: 'D86RtevtfrA',
-      flags: YoutubePlayerFlags(
-        autoPlay: false,
-        mute: true,
-      ),
-  );
+  YoutubePlayerController _controller;
 
   @override
   void initState() { 
     super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: widget.film.videoUrl.split("=")[1],
+      flags: YoutubePlayerFlags(
+        autoPlay: false,
+        mute: true,
+      ),
+    );
     _loadCommnet();
     _relatedFilmLoad();
   }
@@ -44,11 +47,11 @@ class _FilmDeatilsState extends State<FilmDeatils> {
     List<Widget> _relatedFilmListTemp = [];
     List<Film> _filmList = [];
     
-    _filmList.add(Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"));
-    _filmList.add(Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"));
-    _filmList.add(Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"));
-    _filmList.add(Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"));
-    _filmList.add(Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"));
+    _filmList.add(Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
+    _filmList.add(Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
+    _filmList.add(Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
+    _filmList.add(Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
+    _filmList.add(Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
 
     for (var item in _filmList) {
       _relatedFilmListTemp.add(
@@ -320,7 +323,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                     children: <Widget>[
                                                       Text(
-                                                        widget.film.lanuage +" - "+widget.film.genaric,
+                                                        filmLanguageToString(widget.film.lanuage) +" - "+ filmGenaricToString(widget.film.genaric),
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight: FontWeight.w500,
@@ -345,7 +348,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                               padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
                               child: Container(
                                 child:Text(
-                                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum ",
+                                  widget.film.description,
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,

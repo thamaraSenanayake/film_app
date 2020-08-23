@@ -34,6 +34,10 @@ dependencies:
   flutter_staggered_animations: ^0.1.2
   youtube_player_flutter: ^7.0.0+7
   fancy_drawer: ^1.0.0
+  flutter_secure_storage: ^3.3.3
+  cloud_firestore: ^0.13.5
+
+
 
 
 

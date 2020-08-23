@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fancy_drawer/fancy_drawer.dart';
 import 'package:film_app/const.dart';
+import 'package:film_app/database/databse.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
@@ -11,7 +12,10 @@ import 'package:film_app/profile/filmList.dart/filmList.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
+import 'hintDisplay.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -32,7 +36,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   double _height = 0.0;
   double _width = 0.0;
   double _top = 0.0;
-  int filmLength = 0;
   double _pageHeight = 0.0;
   List<Widget> _imageList = [];
   List<Widget> _recentFilmsList = [];
@@ -57,13 +60,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   FancyDrawerController _fancyController;
   final _searchController = TextEditingController();
+  final storage = new FlutterSecureStorage();
+  Database database = Database();
 
   List<Film> _filmList = [
-    Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
-    Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
-    Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
-    Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
-    Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: "Action",lanuage: "English"),
+    Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
   ];
 
 
@@ -82,16 +87,105 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     WidgetsBinding.instance.addPostFrameCallback((_)  {
       _loadSlider();
       _loadFilms();
+      _hintDisplay();
+    });
+
+  
+  }
+
+  _hintDisplay() async {
+    String hint = await storage.read(key: KeyContainer.HINTDISPLAY);
+    if(hint!="false"){
+      Navigator.of(context).push(HintDisplay());
+      await storage.write(key: KeyContainer.HINTDISPLAY,value: "false");
+    }
+  }
+
+  // _loadRecentFilmsList() async{
+    // List<Film> recentFilm = database.r
+  // }
+  _loadnewFilmsList(int filmLength) async{
+    List<Widget> _newFilmsListTemp = [];
+    List<Film> newFilm =await  database.newFilms();
+
+    _newFilmsListTemp.add(GridHeader(title: "Newly Added Films",index: 0,));
+
+    for (var i = 0; i < filmLength; i++) {
+      _newFilmsListTemp.add(
+        GridItem(film: newFilm[i], gridItemListner: this, index: i+1)
+      );
+    } 
+
+    setState(() {
+      _newFilmsList =  _newFilmsListTemp;
+    });
+
+  }
+
+  _loadEnglishFilmsList(int filmLength) async {
+    List<Film> englishFilm =await  database.englishFilms();
+    List<Widget> _englishFilmsListTemp = [];
+    _englishFilmsListTemp.add(GridHeader(title: "English Films",index: 0,));
+
+    for (var i = 0; i < filmLength; i++) {
+      _englishFilmsListTemp.add(
+        GridItem(film: englishFilm[i], gridItemListner: this, index: i+1)
+      );
+    }
+    setState(() {
+      _englishFilmsList =  _englishFilmsListTemp;
+    });
+  }
+
+  _loadHindiFilmsList(int filmLength) async {
+    List<Film> hindiList =await  database.hindiFilms();
+    List<Widget> _hindiFilmsListTemp = [];
+    _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,));
+    for (var i = 0; i < filmLength; i++) {
+      _hindiFilmsListTemp.add(
+        GridItem(film: hindiList[i], gridItemListner: this, index: i+1)
+      );
+    }
+
+    setState(() {
+      _hindiFilmsList =  _hindiFilmsListTemp;
+    });
+
+  } 
+  _loadtamilFilmsList(int filmLength) async {
+    List<Film> tamilFilm =await  database.tamilFilms();
+
+    List<Widget> _tamilFilmsListTemp = [];
+    _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,));
+    for (var i = 0; i < filmLength; i++) {
+      _tamilFilmsListTemp.add(
+        GridItem(film: tamilFilm[i], gridItemListner: this, index: i+1)
+      );
+    }
+    setState(() {
+      _tamilFilmsList =  _tamilFilmsListTemp;
+    });
+  }
+  _loadkoreanFilmsList(int filmLength) async {
+    List<Film> koriyanFilm =await  database.koreanFilms();
+
+    List<Widget> _koreanFilmsListTemp = [];
+    _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,));
+    for (var i = 0; i < filmLength; i++) {
+      _koreanFilmsListTemp.add(
+        GridItem(film: koriyanFilm[i], gridItemListner: this, index: i+1)
+      );
+    }
+    setState(() {
+      _koreanFilmsList =  _koreanFilmsListTemp;
     });
   }
 
   _loadFilms(){
+    int filmLength=0;
+    
     List<Widget> _recentFilmsListTemp = [];
-    List<Widget> _newFilmsListTemp = [];
-    List<Widget> _englishFilmsListTemp = [];
-    List<Widget> _hindiFilmsListTemp = [];
-    List<Widget> _tamilFilmsListTemp = [];
-    List<Widget> _koreanFilmsListTemp = [];
+    
     
     if(_height - 210< _width*1.5){
       setState(() {
@@ -103,59 +197,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       });
     }
 
-    _recentFilmsListTemp.add(GridHeader(title: "Recently Viewed Films",index: 0,));
-    _newFilmsListTemp.add(GridHeader(title: "Newly Added Films",index: 0,));
-    _englishFilmsListTemp.add(GridHeader(title: "English Films",index: 0,));
-    _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,));
-    _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,));
-    _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,));
+    _loadnewFilmsList(filmLength);
+    _loadEnglishFilmsList(filmLength);
+    _loadHindiFilmsList(filmLength);
+    _loadkoreanFilmsList(filmLength);
+    _loadtamilFilmsList(filmLength);
 
-    for (var i = 0; i < filmLength; i++) {
-      print("run");
+    _recentFilmsListTemp.add(GridHeader(title: "Recently Viewed Films",index: 0,));
+
+     for (var i = 0; i < filmLength; i++) {
       _recentFilmsListTemp.add(
         GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
       );
-    } 
-    for (var i = 0; i < filmLength; i++) {
-      _newFilmsListTemp.add(
-        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
-      );
-    } 
-    for (var i = 0; i < filmLength; i++) {
-      _englishFilmsListTemp.add(
-        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
-      );
-    } 
-    for (var i = 0; i < filmLength; i++) {
-      _hindiFilmsListTemp.add(
-        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
-      );
-    } 
-    for (var i = 0; i < filmLength; i++) {
-      _tamilFilmsListTemp.add(
-        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
-      );
-    } 
-    for (var i = 0; i < filmLength; i++) {
-      _koreanFilmsListTemp.add(
-        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
-      );
-    } 
-
-    print(_recentFilmsListTemp.length);
-    print(_newFilmsListTemp.length);
-    print(_englishFilmsListTemp.length);
-    print(_hindiFilmsListTemp.length);
-    print(_tamilFilmsListTemp.length);
-    print(_koreanFilmsListTemp.length);
-
+    }
     setState(() {
-      _recentFilmsList =  _recentFilmsListTemp;
-      _newFilmsList =  _newFilmsListTemp;
-      _englishFilmsList =  _englishFilmsListTemp;
-      _hindiFilmsList =  _hindiFilmsListTemp;
-      _tamilFilmsList =  _tamilFilmsListTemp;
-      _koreanFilmsList =  _koreanFilmsListTemp;
+      _recentFilmsList = _recentFilmsListTemp;
     });
   }
 
@@ -260,7 +316,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   }
 
-  _loadSlider(){
+  _loadSlider() async{
+    //List<Film> filmList = await database.getTopFiveFilms();
+    // print(filmList[0].name);
     List<Widget> _imageListTemp = [];
     for (var item in imgList) {
       _imageListTemp.add(
