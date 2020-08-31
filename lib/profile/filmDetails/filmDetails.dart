@@ -1,7 +1,10 @@
+import 'package:film_app/auth.dart';
+import 'package:film_app/database/databse.dart';
 import 'package:film_app/model/comment.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/comment/commetView.dart';
 import 'package:film_app/module/relatedMovie/relatedMovieItem.dart';
+import 'package:film_app/profile/filmDetails/fullScreenVideo.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -12,7 +15,8 @@ import '../../const.dart';
 
 class FilmDeatils extends StatefulWidget {
   final Film film;
-  FilmDeatils({Key key,@required this.film}) : super(key: key);
+  final Map<String, dynamic> profile;
+  FilmDeatils({Key key,@required this.film, this.profile}) : super(key: key);
 
   @override
   _FilmDeatilsState createState() => _FilmDeatilsState();
@@ -25,6 +29,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
   List<Widget> _relatedFilmList = [];
   List<Comment> _commentList = [];
   final _commentController = TextEditingController();
+  Database database = Database();
   
 
   YoutubePlayerController _controller;
@@ -65,13 +70,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
   }
 
   _loadCommnet(){
-    _commentList.add(
-      Comment(
-        firstName: "Nimal",
-        lastName: "Perera",
-        comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-      )
-    );
+    _commentList = widget.film.commentList;
     _displayCommnet();
   }
 
@@ -90,17 +89,22 @@ class _FilmDeatilsState extends State<FilmDeatils> {
   }
 
   _postCommnet(){
+    if(widget.profile == null){
+      authservice.googleSignIn();
+      return;
+    }
     if(_commentController.text.isNotEmpty){
       _commentList.add(
         Comment(
-          firstName: "First name",
-          lastName: "Last name ",
+          firstName: widget.profile["displayName"].toString().split(" ")[0],
+          lastName: widget.profile["displayName"].toString().split(" ")[1],
           comment: _commentController.text
         )
       );
       _commentController.text = "";
       FocusScope.of(context).unfocus();
       _displayCommnet();
+      database.addComment(_commentList, widget.film.id.toString());
     }
   }
   
@@ -213,13 +217,13 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                           children: <Widget>[
                             Container(
                               width:_width,
-                              height: _height/2 - 100,
+                              height: 250,
                               
                               child: Stack(
                                 children: <Widget>[
                                   Container(
                                     width:_width,
-                                    height: _height/2-200,
+                                    height: 200,
                                     color: Colors.indigo,
                                     child: YoutubePlayer(
                                       controller: _controller,
@@ -267,9 +271,35 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                     ),
                                   ),
 
+                                  Padding(
+                                    padding: const EdgeInsets.only(right:4.0,top:4),
+                                    child: Align(
+                                      alignment: Alignment.topRight,
+                                      child: GestureDetector(
+                                        onTap: (){
+                                          Navigator.of(context).push(
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, _, __) => FullScreenVideo(
+                                                videoUrl: widget.film.videoUrl,
+                                              ),
+                                              opaque: false
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          child: Icon(
+                                            Icons.fullscreen,
+                                            color: Colors.white,
+                                            size: 35,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
                                   //filem name
                                   Padding(
-                                    padding: EdgeInsets.only(left:158,top:_height/2-200),
+                                    padding: EdgeInsets.only(left:158,top:150),
                                     child: Container(
                                       height: 100,
                                       width: _width - 158,
@@ -367,7 +397,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                 height: 200,
                                 width: _width-50,
                                 child: WebView(
-                                  initialUrl: "https://film-c6ade.web.app",
+                                  initialUrl: "https://film-c6ade.web.app/",
                                   javascriptMode: JavascriptMode.unrestricted,
                                 ),
                               ),

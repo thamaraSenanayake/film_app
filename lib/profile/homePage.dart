@@ -19,7 +19,8 @@ import 'hintDisplay.dart';
 
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  final Map<String, dynamic> profile;
+  HomePage({Key key, this.profile}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -123,7 +124,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   _loadEnglishFilmsList(int filmLength) async {
-    List<Film> englishFilm =await  database.englishFilms();
+    List<Film> englishFilm =await  database.loadByLanguageFilms(FilmListCategery.English);
     List<Widget> _englishFilmsListTemp = [];
     _englishFilmsListTemp.add(GridHeader(title: "English Films",index: 0,));
 
@@ -138,7 +139,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   _loadHindiFilmsList(int filmLength) async {
-    List<Film> hindiList =await  database.hindiFilms();
+    List<Film> hindiList =await database.loadByLanguageFilms(FilmListCategery.Hindi);
     List<Widget> _hindiFilmsListTemp = [];
     _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,));
     for (var i = 0; i < filmLength; i++) {
@@ -153,7 +154,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   } 
   _loadtamilFilmsList(int filmLength) async {
-    List<Film> tamilFilm =await  database.tamilFilms();
+    List<Film> tamilFilm =await  database.loadByLanguageFilms(FilmListCategery.Tamil);
 
     List<Widget> _tamilFilmsListTemp = [];
     _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,));
@@ -167,7 +168,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
   }
   _loadkoreanFilmsList(int filmLength) async {
-    List<Film> koriyanFilm =await  database.koreanFilms();
+    List<Film> koriyanFilm =await database.loadByLanguageFilms(FilmListCategery.Korean);
 
     List<Widget> _koreanFilmsListTemp = [];
     _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,));
@@ -457,6 +458,43 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               'assets/image/film.png'
             ),
           ),
+          widget.profile != null? Container(
+            height: 70,
+            width: 190,
+            child: Row(
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  child: Image.network(
+                    widget.profile["photoUrl"],
+                  ),
+                ),
+                SizedBox(
+                  width:20 ,
+                ),
+                Container(
+                  height: 70,
+                  width: 100,
+                  child: Column(
+                    children: [
+                      Text(
+                        widget.profile["displayName"],
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                )
+
+              ],
+            ),
+          ):Container(),
           GestureDetector(
             onTap: (){
               _fancyController.close();
@@ -1276,10 +1314,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, _, __) => FilmDeatils(
-              film: film,
+          film: film,
+          profile: widget.profile,
         ),
         opaque: false
       ),
     );
+  }
+
+  @override
+  gridItemTitleClick(FilmListCategery filmListCategery) {
+    // TODO: implement gridItemTitleClick
+    throw UnimplementedError();
   }
 }

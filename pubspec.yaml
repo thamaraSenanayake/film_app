@@ -36,6 +36,15 @@ dependencies:
   fancy_drawer: ^1.0.0
   flutter_secure_storage: ^3.3.3
   cloud_firestore: ^0.13.5
+  firebase_auth: ^0.15.5+2
+  firebase_core: ^0.4.4
+  google_sign_in: ^4.5.3
+  rxdart: ^0.24.1
+  awesome_loader: ^0.0.3
+
+
+
+
 
 
 

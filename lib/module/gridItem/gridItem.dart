@@ -73,6 +73,8 @@ class _GridItemState extends State<GridItem> {
                                 color: Colors.white,
                                 fontSize: 18
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

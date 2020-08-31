@@ -10,6 +10,10 @@ class KeyContainer {
   static const String HINTDISPLAY = 'hint';
 }
 
+class AppData{
+  static var lastVisible;
+}
+
 enum FilmListCategery{
   RecentlyView,
   NewlyAdd,

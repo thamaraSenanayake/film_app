@@ -1,10 +1,15 @@
+import 'package:film_app/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
+import 'girditemListner.dart';
 
 class GridHeader extends StatefulWidget {
   final String title;
   final int index;
-  GridHeader({Key key,@required this.title, this.index}) : super(key: key);
+  final GridItemListner gridItemListner;
+  final FilmListCategery filmListCategery;
+  GridHeader({Key key,@required this.title, this.index,@required this.gridItemListner,@required this.filmListCategery}) : super(key: key);
 
   @override
   _GridHeaderState createState() => _GridHeaderState();
@@ -40,18 +45,23 @@ class _GridHeaderState extends State<GridHeader> {
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: Container(
-                    // width: 110,
-                    child: Text(
-                      "See All",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.red,
-                        decoration: TextDecoration.underline,
+                  child: GestureDetector(
+                    onTap: (){
+                      widget.gridItemListner.gridItemListner(widget.gridItemListner.gridItemTitleClick(widget.filmListCategery));
+                    },
+                    child: Container(
+                      // width: 110,
+                      child: Text(
+                        "See All",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.red,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
+                      
                     ),
-                    
                   ),
                 )
               ],

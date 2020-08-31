@@ -1,3 +1,5 @@
+import 'package:awesome_loader/awesome_loader.dart';
+import 'package:film_app/auth.dart';
 import 'package:film_app/const.dart';
 import 'package:film_app/profile/homePage.dart';
 import 'package:flutter/material.dart';
@@ -13,11 +15,34 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> with TickerProviderStateMixin{
   double _height = 0.0;
   double _width = 0.0;
+  bool _loading =true;
+  Map<String, dynamic> _profile;
 
   @override
   void initState() {
     super.initState();
-    
+    _profile = null;
+    _loading = false;
+    // _loadingTime();
+  }
+  
+  _loadingTime() async{
+    await new Future.delayed(const Duration(seconds : 3));
+    authservice.profile.listen((event) { 
+      print("profile"+event.toString());
+      setState(() {
+        _profile = event;
+        _loading = false;
+      });
+      if(_profile!= null){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(profile: _profile,)
+          )
+        );
+      }
+    });
   }
 
   @override
@@ -61,23 +86,30 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin{
             padding: const EdgeInsets.only(bottom:50.0),
             child: Align(
               alignment: Alignment.bottomCenter,
-              child: Container(
+              child: 
+              !_loading && _profile == null ?Container(
                 height: 150,
                 child: Column(
                   children: <Widget>[
-                    Container(
-                      width: _width-60,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: ColorList.Red,
-                        borderRadius: BorderRadius.circular(3.0)
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white
+                    GestureDetector(
+                      onTap: (){
+                        print("googleSignIn");
+                        authservice.googleSignIn();
+                      },
+                      child: Container(
+                        width: _width-60,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: ColorList.Red,
+                          borderRadius: BorderRadius.circular(3.0)
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white
+                            ),
                           ),
                         ),
                       ),
@@ -117,9 +149,17 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin{
 
                   ],
                 ),
+              ):Container(
+                height: 150,
+                width: _width,
+                color: ColorList.Black.withOpacity(0.5),
+                child:AwesomeLoader(
+                  loaderType: AwesomeLoader.AwesomeLoader3,
+                  color: ColorList.Red,
+                ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

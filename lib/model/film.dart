@@ -1,3 +1,5 @@
+import 'package:film_app/model/comment.dart';
+
 import '../const.dart';
 
 class Film{
@@ -11,6 +13,7 @@ class Film{
   final int id;
   final String videoUrl;
   final topMovie;
+  final List<Comment> commentList;
 
-  Film({this.topMovie, this.videoUrl,this.id,this.name, this.year, this.imgUrl, this.ratings, this.description, this.genaric, this.lanuage});
+  Film({this.commentList, this.topMovie, this.videoUrl,this.id,this.name, this.year, this.imgUrl, this.ratings, this.description, this.genaric, this.lanuage});
 }
