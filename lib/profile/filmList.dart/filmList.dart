@@ -1,3 +1,5 @@
+import 'package:awesome_loader/awesome_loader.dart';
+import 'package:film_app/database/databse.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
@@ -23,6 +25,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
   String _title = "";
   final _searchController = TextEditingController();
   FilmGenaricList filmGenaricList = FilmGenaricList.All;
+  bool _loading = true;
+  List<Widget> _filmListWidget =[];
+  Database database = Database(); 
 
   _search(){
     setState(() {
@@ -35,6 +40,46 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
   void initState() {
     super.initState();
     _setTitle();
+    _loadFilms();
+  }
+
+  _loadFilms() async{
+    List<Widget> _filmListWidgetTemp =[]; 
+    List<Film> _filmList = [];
+    if(widget.filmListCategery == FilmListCategery.NewlyAdd ){
+      _filmList = await database.newFilms(25);
+    }else{
+      _filmList = await database.allMovies(widget.filmListCategery, 25);
+    }
+    for (var item in _filmList) {
+      _filmListWidgetTemp.add(
+        GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+      );
+    }
+    setState(() {
+      _filmListWidget = _filmListWidgetTemp;
+      _loading = false;
+    });
+
+  }
+
+  _loadGenaric(FilmGenaricList filmGenaricList) async {
+    List<Widget> _filmListWidgetTemp =[]; 
+    List<Film> _filmList = [];
+    if(widget.filmListCategery == FilmListCategery.NewlyAdd){
+      _filmList = await database.newMoviesWithGenaric(filmGenaricList, 25);
+    }else{
+      _filmList = await database.moviesWithGenaric(widget.filmListCategery,filmGenaricList, 25);
+    }
+    for (var item in _filmList) {
+      _filmListWidgetTemp.add(
+        GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+      );
+    }
+    setState(() {
+      _filmListWidget = _filmListWidgetTemp;
+      _loading = false;
+    });
   }
 
   _setTitle(){
@@ -260,7 +305,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                 onTap: (){
                                   setState(() {
                                     filmGenaricList = FilmGenaricList.All;
+                                    _loading = true;
                                   });
+                                  _loadFilms();
                                 },
                                 child: Container(
                                   width: 100,
@@ -291,7 +338,10 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                 onTap: (){
                                   setState(() {
                                     filmGenaricList = FilmGenaricList.Action;
+                                    _loading = true;
                                   });
+                                  _loadGenaric(filmGenaricList);
+                                  
                                 },
                                 child: Container(
                                   width: 100,
@@ -322,7 +372,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                 onTap: (){
                                   setState(() {
                                     filmGenaricList = FilmGenaricList.Advenure;
+                                  _loading = true;
                                   });
+                                  _loadGenaric(filmGenaricList);
                                 },
                                 child: Container(
                                   width: 100,
@@ -353,7 +405,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                 onTap: (){
                                   setState(() {
                                     filmGenaricList = FilmGenaricList.Horror;
+                                  _loading = true;
                                   });
+                                  _loadGenaric(filmGenaricList);
                                 },
                                 child: Container(
                                   width: 100,
@@ -384,7 +438,9 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                 onTap: (){
                                   setState(() {
                                     filmGenaricList = FilmGenaricList.Crime;
+                                  _loading = true;
                                   });
+                                  _loadGenaric(filmGenaricList);
                                 },
                                 child: Container(
                                   width: 100,
@@ -415,6 +471,15 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                     ),
                     SizedBox(height: 20,),
 
+                    _loading?Container(
+                      height: _height,
+                      width: _width,
+                      color: ColorList.Black.withOpacity(0.5),
+                      child:AwesomeLoader(
+                        loaderType: AwesomeLoader.AwesomeLoader3,
+                        color: ColorList.Red,
+                      ),
+                    ):
                     Container(
                       height: _height -190,
                       width: _width,
@@ -425,14 +490,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                           crossAxisSpacing: 0,
                           mainAxisSpacing: 0,
                           crossAxisCount: 2,
-                          children: <Widget>[
-                            GridItem(film: Film(imgUrl:'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/62077a91502251.5e332b479a8d3.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 0),
-                            GridItem(film: Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 1),
-                            GridItem(film: Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 2),
-                            GridItem(film: Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 3),
-                            GridItem(film: Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 4),
-                            GridItem(film: Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English), gridItemListner: this, index: 5)
-                          ],
+                          children: _filmListWidget
                         ),
                       ),
                     )
@@ -453,10 +511,15 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, _, __) => FilmDeatils(
-              film: film,
+          film: film,
         ),
         opaque: false
       ),
     );
+  }
+
+  @override
+  gridItemTitleClick(FilmListCategery filmListCategery) {
+    
   }
 }

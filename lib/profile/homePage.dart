@@ -107,9 +107,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   // }
   _loadnewFilmsList(int filmLength) async{
     List<Widget> _newFilmsListTemp = [];
-    List<Film> newFilm =await  database.newFilms();
+    List<Film> newFilm =await  database.newFilms(5);
 
-    _newFilmsListTemp.add(GridHeader(title: "Newly Added Films",index: 0,));
+    _newFilmsListTemp.add(GridHeader(title: "Newly Added Films",index: 0,filmListCategery:FilmListCategery.NewlyAdd,gridItemListner:this));
 
     for (var i = 0; i < filmLength; i++) {
       _newFilmsListTemp.add(
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   _loadEnglishFilmsList(int filmLength) async {
     List<Film> englishFilm =await  database.loadByLanguageFilms(FilmListCategery.English);
     List<Widget> _englishFilmsListTemp = [];
-    _englishFilmsListTemp.add(GridHeader(title: "English Films",index: 0,));
+    _englishFilmsListTemp.add(GridHeader(title: "English Films",index: 0,filmListCategery:FilmListCategery.English,gridItemListner:this));
 
     for (var i = 0; i < filmLength; i++) {
       _englishFilmsListTemp.add(
@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   _loadHindiFilmsList(int filmLength) async {
     List<Film> hindiList =await database.loadByLanguageFilms(FilmListCategery.Hindi);
     List<Widget> _hindiFilmsListTemp = [];
-    _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,));
+    _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,filmListCategery:FilmListCategery.Hindi,gridItemListner:this));
     for (var i = 0; i < filmLength; i++) {
       _hindiFilmsListTemp.add(
         GridItem(film: hindiList[i], gridItemListner: this, index: i+1)
@@ -157,7 +157,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     List<Film> tamilFilm =await  database.loadByLanguageFilms(FilmListCategery.Tamil);
 
     List<Widget> _tamilFilmsListTemp = [];
-    _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,));
+    _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,filmListCategery:FilmListCategery.Tamil,gridItemListner:this));
     for (var i = 0; i < filmLength; i++) {
       _tamilFilmsListTemp.add(
         GridItem(film: tamilFilm[i], gridItemListner: this, index: i+1)
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     List<Film> koriyanFilm =await database.loadByLanguageFilms(FilmListCategery.Korean);
 
     List<Widget> _koreanFilmsListTemp = [];
-    _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,));
+    _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,filmListCategery:FilmListCategery.Korean,gridItemListner:this));
     for (var i = 0; i < filmLength; i++) {
       _koreanFilmsListTemp.add(
         GridItem(film: koriyanFilm[i], gridItemListner: this, index: i+1)
@@ -204,7 +204,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _loadkoreanFilmsList(filmLength);
     _loadtamilFilmsList(filmLength);
 
-    _recentFilmsListTemp.add(GridHeader(title: "Recently Viewed Films",index: 0,));
+    _recentFilmsListTemp.add(GridHeader(title: "Recently Viewed Films",index: 0,filmListCategery:FilmListCategery.RecentlyView,gridItemListner:this));
 
      for (var i = 0; i < filmLength; i++) {
       _recentFilmsListTemp.add(
@@ -1324,7 +1324,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   gridItemTitleClick(FilmListCategery filmListCategery) {
-    // TODO: implement gridItemTitleClick
-    throw UnimplementedError();
+    print(filmListCategery);
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, _, __) => FilmList(
+          filmListCategery: filmListCategery,
+        ),
+        opaque: false
+      ),
+    );
   }
 }

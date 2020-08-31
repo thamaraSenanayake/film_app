@@ -47,7 +47,7 @@ class _GridHeaderState extends State<GridHeader> {
                   alignment: Alignment.bottomCenter,
                   child: GestureDetector(
                     onTap: (){
-                      widget.gridItemListner.gridItemListner(widget.gridItemListner.gridItemTitleClick(widget.filmListCategery));
+                      widget.gridItemListner.gridItemTitleClick(widget.filmListCategery);
                     },
                     child: Container(
                       // width: 110,
