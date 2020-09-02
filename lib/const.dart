@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ColorList{
@@ -11,7 +12,8 @@ class KeyContainer {
 }
 
 class AppData{
-  static var lastVisible;
+  static DocumentSnapshot lastVisible;
+  static const int pagesize =10; 
 }
 
 enum FilmListCategery{

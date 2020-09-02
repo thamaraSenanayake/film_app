@@ -5,6 +5,7 @@ import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../const.dart';
@@ -22,12 +23,14 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
   double _width = 0.0;
   bool _genaricDisplay = false;
   bool _showSearchText = false;
+  ScrollController _controller;
   String _title = "";
   final _searchController = TextEditingController();
   FilmGenaricList filmGenaricList = FilmGenaricList.All;
   bool _loading = true;
   List<Widget> _filmListWidget =[];
   Database database = Database(); 
+  List<Film> _filmList = [];
 
   _search(){
     setState(() {
@@ -39,21 +42,83 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
   @override
   void initState() {
     super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
     _setTitle();
     _loadFilms();
   }
 
-  _loadFilms() async{
+  _scrollListener(){
+    print(_controller.position.atEdge);
+    print(_controller.position.userScrollDirection);
+    if(_controller.position.atEdge && _controller.position.userScrollDirection == ScrollDirection.reverse){
+      _nextFilm();
+    }
+  }
+
+  _nextFilm() async {
     List<Widget> _filmListWidgetTemp =[]; 
-    List<Film> _filmList = [];
+    List<Film> _filmListTemp = [];
+
     if(widget.filmListCategery == FilmListCategery.NewlyAdd ){
-      _filmList = await database.newFilms(25);
+      if(filmGenaricList == FilmGenaricList.All){
+        _filmListTemp.addAll(await database.newFilmsNext(AppData.pagesize));
+      }else{
+        _filmListTemp.addAll(await database.newMoviesWithGenaricNext(filmGenaricList,AppData.pagesize));
+      }
     }else{
-      _filmList = await database.allMovies(widget.filmListCategery, 25);
+      if(filmGenaricList == FilmGenaricList.All){
+        _filmListTemp.addAll(await database.allMoviesNext(widget.filmListCategery, AppData.pagesize));
+      }else{
+        _filmListTemp.addAll(await database.moviesWithGenaricNext(widget.filmListCategery,filmGenaricList, AppData.pagesize));
+      }
+    }
+
+    
+     _filmList.addAll(_filmListTemp);
+
+
+    for (var item in _filmList) {
+      _filmListWidgetTemp.add(
+        GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+      );
+    }
+
+    if(_filmListTemp.length == AppData.pagesize){
+      _filmListWidgetTemp.add(
+        AwesomeLoader(
+          loaderType: AwesomeLoader.AwesomeLoader3,
+          color: ColorList.Red,
+        ),
+      );
+    }
+    
+    setState(() {
+      _filmListWidget = _filmListWidgetTemp;
+      _loading = false;
+    });
+  }
+
+  _loadFilms() async{
+    _filmList = [];
+    List<Widget> _filmListWidgetTemp =[]; 
+    
+    if(widget.filmListCategery == FilmListCategery.NewlyAdd ){
+      _filmList = await database.newFilms(AppData.pagesize);
+    }else{
+      _filmList = await database.allMovies(widget.filmListCategery, AppData.pagesize);
     }
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
         GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+      );
+    }
+    if(_filmList.length == AppData.pagesize){
+      _filmListWidgetTemp.add(
+        AwesomeLoader(
+          loaderType: AwesomeLoader.AwesomeLoader3,
+          color: ColorList.Red,
+        ),
       );
     }
     setState(() {
@@ -63,17 +128,25 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
 
   }
 
-  _loadGenaric(FilmGenaricList filmGenaricList) async {
+  _loadGenaric() async {
     List<Widget> _filmListWidgetTemp =[]; 
-    List<Film> _filmList = [];
+    _filmList = [];
     if(widget.filmListCategery == FilmListCategery.NewlyAdd){
-      _filmList = await database.newMoviesWithGenaric(filmGenaricList, 25);
+      _filmList = await database.newMoviesWithGenaric(filmGenaricList, AppData.pagesize);
     }else{
-      _filmList = await database.moviesWithGenaric(widget.filmListCategery,filmGenaricList, 25);
+      _filmList = await database.moviesWithGenaric(widget.filmListCategery,filmGenaricList, AppData.pagesize);
     }
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
         GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+      );
+    }
+    if(_filmList.length == AppData.pagesize){
+      _filmListWidgetTemp.add(
+        AwesomeLoader(
+          loaderType: AwesomeLoader.AwesomeLoader3,
+          color: ColorList.Red,
+        ),
       );
     }
     setState(() {
@@ -340,7 +413,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     filmGenaricList = FilmGenaricList.Action;
                                     _loading = true;
                                   });
-                                  _loadGenaric(filmGenaricList);
+                                  _loadGenaric();
                                   
                                 },
                                 child: Container(
@@ -374,7 +447,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     filmGenaricList = FilmGenaricList.Advenure;
                                   _loading = true;
                                   });
-                                  _loadGenaric(filmGenaricList);
+                                  _loadGenaric();
                                 },
                                 child: Container(
                                   width: 100,
@@ -407,7 +480,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     filmGenaricList = FilmGenaricList.Horror;
                                   _loading = true;
                                   });
-                                  _loadGenaric(filmGenaricList);
+                                  _loadGenaric();
                                 },
                                 child: Container(
                                   width: 100,
@@ -440,7 +513,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     filmGenaricList = FilmGenaricList.Crime;
                                   _loading = true;
                                   });
-                                  _loadGenaric(filmGenaricList);
+                                  _loadGenaric();
                                 },
                                 child: Container(
                                   width: 100,
@@ -485,6 +558,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                       width: _width,
                       child: AnimationLimiter(
                         child: GridView.count(
+                          controller:_controller,
                           primary: false,
                           // padding: const EdgeInsets.all(20),
                           crossAxisSpacing: 0,
@@ -493,12 +567,33 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                           children: _filmListWidget
                         ),
                       ),
-                    )
+                    ),
+                    
+                    // Container(
+                    //           height: 50,
+                    //           width: _width,
+                    //           child: Align(
+                    //             alignment: Alignment.centerRight,
+                    //             child: Container(
+                    //               decoration: BoxDecoration(
+                    //                 shape: BoxShape.circle,
+                    //                 color: ColorList.Red
+                    //               ),
+                    //               child: Padding(
+                    //                 padding: EdgeInsets.all(4),
+                    //                 child: Icon(
+                    //                   Icons.arrow_forward,
+                    //                   color: ColorList.Black,
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         )
+
                   ],
                 )
               ),
-            )
-
+            ),
           ],
         ),
 
