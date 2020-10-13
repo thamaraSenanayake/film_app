@@ -8,9 +8,9 @@ import '../../const.dart';
 
 class GridItem extends StatefulWidget {
   final Film film;
-  final GridItemListner gridItemListner;
+  final GridItemListner gridItemListener;
   final int index;
-  GridItem({Key key, @required this.film,@required this.gridItemListner,@required this.index}) : super(key: key);
+  GridItem({Key key, @required this.film,@required this.gridItemListener,@required this.index}) : super(key: key);
 
   @override
   _GridItemState createState() => _GridItemState();
@@ -32,7 +32,7 @@ class _GridItemState extends State<GridItem> {
         child: FadeInAnimation(
           child: GestureDetector(
             onTap: (){
-              widget.gridItemListner.gridItemListner(widget.film);
+              widget.gridItemListener.gridItemListner(widget.film);
             },
             child: Container(
               child: Stack(

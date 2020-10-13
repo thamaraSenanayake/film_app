@@ -1,14 +1,17 @@
 import 'dart:async';
-
+import 'package:film_app/auth.dart';
 import 'package:fancy_drawer/fancy_drawer.dart';
 import 'package:film_app/const.dart';
 import 'package:film_app/database/databse.dart';
+import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/module/gridItem/gridTitle.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
 import 'package:film_app/profile/filmList.dart/filmList.dart';
+import 'package:film_app/profile/filmList.dart/filmListFavourite.dart';
+import 'package:film_app/profile/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/rendering.dart';
@@ -33,7 +36,7 @@ final List<String> imgList = [
   'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',
   'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',
 ];
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin  implements GridItemListner { 
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin  implements GridItemListner,HomePageListener { 
   double _height = 0.0;
   double _width = 0.0;
   double _top = 0.0;
@@ -58,6 +61,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   bool _tamilFilms = false;
   bool _koreanFilms = false;
   bool _showSearchText = false;
+  
+  bool _isLoading = false;
 
   FancyDrawerController _fancyController;
   final _searchController = TextEditingController();
@@ -65,11 +70,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Database database = Database();
 
   List<Film> _filmList = [
-    Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    // Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    // Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    // Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    // Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
+    // Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
   ];
 
 
@@ -105,7 +110,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   // _loadRecentFilmsList() async{
     // List<Film> recentFilm = database.r
   // }
-  _loadnewFilmsList(int filmLength) async{
+  _loadNewFilmsList(int filmLength) async{
     List<Widget> _newFilmsListTemp = [];
     List<Film> newFilm =await  database.newFilms(5);
 
@@ -113,7 +118,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     for (var i = 0; i < filmLength; i++) {
       _newFilmsListTemp.add(
-        GridItem(film: newFilm[i], gridItemListner: this, index: i+1)
+        GridItem(film: newFilm[i], gridItemListener: this, index: i+1)
       );
     } 
 
@@ -130,7 +135,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     for (var i = 0; i < filmLength; i++) {
       _englishFilmsListTemp.add(
-        GridItem(film: englishFilm[i], gridItemListner: this, index: i+1)
+        GridItem(film: englishFilm[i], gridItemListener: this, index: i+1)
       );
     }
     setState(() {
@@ -144,7 +149,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _hindiFilmsListTemp.add(GridHeader(title: "Hindi Films",index: 0,filmListCategery:FilmListCategery.Hindi,gridItemListner:this));
     for (var i = 0; i < filmLength; i++) {
       _hindiFilmsListTemp.add(
-        GridItem(film: hindiList[i], gridItemListner: this, index: i+1)
+        GridItem(film: hindiList[i], gridItemListener: this, index: i+1)
       );
     }
 
@@ -153,28 +158,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
 
   } 
-  _loadtamilFilmsList(int filmLength) async {
+  _loadTamilFilmsList(int filmLength) async {
     List<Film> tamilFilm =await  database.loadByLanguageFilms(FilmListCategery.Tamil);
 
     List<Widget> _tamilFilmsListTemp = [];
     _tamilFilmsListTemp.add(GridHeader(title: "Tamil Films",index: 0,filmListCategery:FilmListCategery.Tamil,gridItemListner:this));
     for (var i = 0; i < filmLength; i++) {
       _tamilFilmsListTemp.add(
-        GridItem(film: tamilFilm[i], gridItemListner: this, index: i+1)
+        GridItem(film: tamilFilm[i], gridItemListener: this, index: i+1)
       );
     }
     setState(() {
       _tamilFilmsList =  _tamilFilmsListTemp;
     });
   }
-  _loadkoreanFilmsList(int filmLength) async {
-    List<Film> koriyanFilm =await database.loadByLanguageFilms(FilmListCategery.Korean);
+  _loadKoreanFilmsList(int filmLength) async {
+    List<Film> koreanFilm =await database.loadByLanguageFilms(FilmListCategery.Korean);
 
     List<Widget> _koreanFilmsListTemp = [];
     _koreanFilmsListTemp.add(GridHeader(title: "Korean Films",index: 0,filmListCategery:FilmListCategery.Korean,gridItemListner:this));
     for (var i = 0; i < filmLength; i++) {
       _koreanFilmsListTemp.add(
-        GridItem(film: koriyanFilm[i], gridItemListner: this, index: i+1)
+        GridItem(film: koreanFilm[i], gridItemListener: this, index: i+1)
       );
     }
     setState(() {
@@ -182,7 +187,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
   }
 
-  _loadFilms(){
+  _loadFilms() async {
     int filmLength=0;
     
     List<Widget> _recentFilmsListTemp = [];
@@ -198,18 +203,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       });
     }
 
-    _loadnewFilmsList(filmLength);
+    _loadNewFilmsList(filmLength);
     _loadEnglishFilmsList(filmLength);
     _loadHindiFilmsList(filmLength);
-    _loadkoreanFilmsList(filmLength);
-    _loadtamilFilmsList(filmLength);
+    _loadKoreanFilmsList(filmLength);
+    _loadTamilFilmsList(filmLength);
 
     _recentFilmsListTemp.add(GridHeader(title: "Recently Viewed Films",index: 0,filmListCategery:FilmListCategery.RecentlyView,gridItemListner:this));
-
-     for (var i = 0; i < filmLength; i++) {
-      _recentFilmsListTemp.add(
-        GridItem(film: _filmList[i], gridItemListner: this, index: i+1)
-      );
+    List<Film> _recentFilm = await DBProvider.db.recentFilmList();
+    print("_recentFilm");
+    print(_recentFilm.length);
+    if(_recentFilm.length >=  filmLength){
+      for (var i = 0; i < filmLength; i++) {
+        _recentFilmsListTemp.add(
+          GridItem(film: _recentFilm[i], gridItemListener: this, index: i+1)
+        );
+      }
     }
     setState(() {
       _recentFilmsList = _recentFilmsListTemp;
@@ -523,6 +532,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           GestureDetector(
             onTap: (){
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, _, __) => FilmListFavorite(),
+                  opaque: false
+                ),
+              );
               _fancyController.close();
             },
             child: Container(
@@ -536,7 +551,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     width:10
                   ),
                   Text(
-                    "Favourite",
+                    "Favorite",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -549,6 +564,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           GestureDetector(
             onTap: (){
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, _, __) => Settings(),
+                  opaque: false
+                ),
+              );
               _fancyController.close();
             },
             child: Container(
@@ -575,6 +596,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           GestureDetector(
             onTap: (){
+              authservice.googleSignIn();
               _fancyController.close();
             },
             child: Container(
@@ -588,7 +610,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     width:10
                   ),
                   Text(
-                    "Login",
+                    widget.profile == null? "Login":"Logout",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -818,6 +840,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.English,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -854,6 +877,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.Hindi,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -890,6 +914,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.Tamil,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -926,6 +951,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.Telugu,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -962,6 +988,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.Korean,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -997,7 +1024,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                     Navigator.of(context).push(
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
-                                                          filmListCategery: FilmListCategery.TvSerices,
+                                                          filmListCategery: FilmListCategery.TvSeries,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -1015,7 +1043,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       child: Padding(
                                                         padding: const EdgeInsets.all(8.0),
                                                         child: Text(
-                                                          "TV serices",
+                                                          "TV Series",
                                                           style:TextStyle(
                                                             color: ColorList.Black,
                                                             fontSize: 15
@@ -1034,6 +1062,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                       PageRouteBuilder(
                                                         pageBuilder: (context, _, __) => FilmList(
                                                           filmListCategery: FilmListCategery.Other,
+                                                          listener: this,
                                                         ),
                                                         opaque: false
                                                       ),
@@ -1079,7 +1108,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children:_recentFilmsList
+                                            children:_recentFilmsList.length != 1?_recentFilmsList:_newFilmsList
                                             
                                           ),
                                         ),
@@ -1114,7 +1143,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: _newFilmsList,
+                                            children:_recentFilmsList.length != 1?_newFilmsList:_englishFilmsList,
                                           ),
                                         ),
                                       ):
@@ -1147,7 +1176,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: _englishFilmsList,
+                                            children:_recentFilmsList.length != 1?_englishFilmsList:_hindiFilmsList,
                                           ),
                                         ),
                                       ):
@@ -1180,7 +1209,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children: _hindiFilmsList,
+                                            children:_recentFilmsList.length != 1? _hindiFilmsList:_tamilFilmsList,
                                           ),
                                         ),
                                       ):
@@ -1213,7 +1242,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0,
                                             crossAxisCount: 2,
-                                            children:_tamilFilmsList,
+                                            children:_recentFilmsList.length != 1? _tamilFilmsList:_koreanFilmsList,
                                           ),
                                         ),
                                       ):
@@ -1227,7 +1256,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 ),
 
                                 //korean films
-                                Container(
+                                _recentFilmsList.length != 1?Container(
                                   height: _height-100,
                                   width: _width,
                                   child: Column(
@@ -1257,7 +1286,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       SizedBox(height: 20,),
                                     ],
                                   ),
-                                )
+                                ):Container()
                               ],
                             ),
                           ),
@@ -1311,9 +1340,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   gridItemListner(Film film) {
+    DBProvider.db.addRecentlyViewFilm(film); 
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, _, __) => FilmDeatils(
+        pageBuilder: (context, _, __) => FilmDetails(
           film: film,
           profile: widget.profile,
         ),
@@ -1329,9 +1359,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       PageRouteBuilder(
         pageBuilder: (context, _, __) => FilmList(
           filmListCategery: filmListCategery,
+          listener: this,
         ),
         opaque: false
       ),
     );
   }
+
+  @override
+  reloadFilms() {
+    _loadFilms();
+  }
+}
+
+abstract class HomePageListener{
+  reloadFilms();
 }

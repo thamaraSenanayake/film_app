@@ -9,11 +9,17 @@ class ColorList{
 
 class KeyContainer {
   static const String HINTDISPLAY = 'hint';
+  static const String NOTIFICATION = 'notification';
 }
 
 class AppData{
   static DocumentSnapshot lastVisible;
   static const int pagesize =10; 
+  static int isDark = 0;
+  static String appIdAndroid ="";
+  static String appIdIos ="";
+  static String email ="";
+  static String addIdAndroid ="";
 }
 
 enum FilmListCategery{
@@ -23,14 +29,14 @@ enum FilmListCategery{
   Telugu,
   Korean,
   Hindi,
-  TvSerices,
+  TvSeries,
   Other,
   Tamil
 }
 
 enum FilmGenaricList{
   Action,
-  Advenure,
+  Adventure,
   Horror,
   Crime,
   Comedy,

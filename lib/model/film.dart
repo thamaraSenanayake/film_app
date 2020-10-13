@@ -12,7 +12,7 @@ class Film{
   final FilmListCategery lanuage;
   final int id;
   final String videoUrl;
-  final topMovie;
+  final bool topMovie;
   final List<Comment> commentList;
 
   Film({this.commentList, this.topMovie, this.videoUrl,this.id,this.name, this.year, this.imgUrl, this.ratings, this.description, this.genaric, this.lanuage});

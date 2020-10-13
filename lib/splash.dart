@@ -1,6 +1,7 @@
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:film_app/auth.dart';
 import 'package:film_app/const.dart';
+import 'package:film_app/database/databse.dart';
 import 'package:film_app/profile/homePage.dart';
 import 'package:flutter/material.dart';
 
@@ -21,9 +22,15 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
-    _profile = null;
-    _loading = false;
-    // _loadingTime();
+    // _profile = null;
+    // _loading = false;
+    _loadingTime();
+    _getSystemData();
+  }
+
+  _getSystemData(){
+    Database database = new Database();
+    database.getSystemData();
   }
   
   _loadingTime() async{

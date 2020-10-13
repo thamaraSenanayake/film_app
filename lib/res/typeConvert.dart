@@ -1,10 +1,10 @@
 import '../const.dart';
 
-FilmGenaricList filmGenaricConvert(String filmGenaricList){
+FilmGenaricList filmGenericConvert(String filmGenaricList){
   if (FilmGenaricList.Action.toString() == filmGenaricList) {
     return FilmGenaricList.Action;
-  } else if (FilmGenaricList.Advenure.toString() == filmGenaricList) {
-    return FilmGenaricList.Advenure;
+  } else if (FilmGenaricList.Adventure.toString() == filmGenaricList) {
+    return FilmGenaricList.Adventure;
   }else if (FilmGenaricList.All.toString() == filmGenaricList) {
     return FilmGenaricList.All;
   }else if (FilmGenaricList.Bio.toString() == filmGenaricList) {
@@ -24,32 +24,32 @@ FilmGenaricList filmGenaricConvert(String filmGenaricList){
   }
 }
 
-FilmListCategery filmListCategeryConvert(String filmListCategery){
-  if(FilmListCategery.RecentlyView.toString() == filmListCategery){
+FilmListCategery filmListCategoryConvert(String filmListCategory){
+  if(FilmListCategery.RecentlyView.toString() == filmListCategory){
     return FilmListCategery.RecentlyView;
   }
-  else if(FilmListCategery.NewlyAdd.toString() == filmListCategery){
+  else if(FilmListCategery.NewlyAdd.toString() == filmListCategory){
     return FilmListCategery.NewlyAdd;
   }
-  else if(FilmListCategery.English.toString() == filmListCategery){
+  else if(FilmListCategery.English.toString() == filmListCategory){
     return FilmListCategery.English;
   }
-  else if(FilmListCategery.Telugu.toString() == filmListCategery){
+  else if(FilmListCategery.Telugu.toString() == filmListCategory){
     return FilmListCategery.Telugu;
   }
-  else if(FilmListCategery.Korean.toString() == filmListCategery){
+  else if(FilmListCategery.Korean.toString() == filmListCategory){
     return FilmListCategery.Korean;
   }
-  else if(FilmListCategery.Hindi.toString() == filmListCategery){
+  else if(FilmListCategery.Hindi.toString() == filmListCategory){
     return FilmListCategery.Hindi;
   }
-  else if(FilmListCategery.TvSerices.toString() == filmListCategery){
-    return FilmListCategery.TvSerices;
+  else if(FilmListCategery.TvSeries.toString() == filmListCategory){
+    return FilmListCategery.TvSeries;
   }
-  else if(FilmListCategery.Other.toString() == filmListCategery){
+  else if(FilmListCategery.Other.toString() == filmListCategory){
     return FilmListCategery.Other;
   }
-  else if(FilmListCategery.Tamil.toString() == filmListCategery){
+  else if(FilmListCategery.Tamil.toString() == filmListCategory){
     return FilmListCategery.Tamil;
   }else{
     return null;
@@ -62,8 +62,8 @@ String filmGenaricToString(FilmGenaricList filmGenaric){
   if(FilmGenaricList.Action == filmGenaric){
     genaric ="Action";
   }
-  else if(FilmGenaricList.Advenure == filmGenaric){
-    genaric ="Advenure";
+  else if(FilmGenaricList.Adventure == filmGenaric){
+    genaric ="adventure";
   }
   else if(FilmGenaricList.Horror == filmGenaric){
     genaric ="Horror";
@@ -90,33 +90,33 @@ String filmGenaricToString(FilmGenaricList filmGenaric){
 }
 
 String filmLanguageToString(FilmListCategery filmListCategery){
-  String lanuage = "";
+  String language = "";
   if(FilmListCategery.RecentlyView == filmListCategery){
-    lanuage = "RecentlyView";
+    language = "RecentlyView";
   }
   else if(FilmListCategery.NewlyAdd == filmListCategery){
-    lanuage = "NewlyAdd";
+    language = "NewlyAdd";
   }
   else if(FilmListCategery.English == filmListCategery){
-    lanuage = "English";
+    language = "English";
   }
   else if(FilmListCategery.Telugu == filmListCategery){
-    lanuage = "Telugu";
+    language = "Telugu";
   }
   else if(FilmListCategery.Korean == filmListCategery){
-    lanuage = "Korean";
+    language = "Korean";
   }
   else if(FilmListCategery.Hindi == filmListCategery){
-    lanuage = "Hindi";
+    language = "Hindi";
   }
-  else if(FilmListCategery.TvSerices == filmListCategery){
-    lanuage = "TvSerices";
+  else if(FilmListCategery.TvSeries == filmListCategery){
+    language = "TvSeries";
   }
   else if(FilmListCategery.Other == filmListCategery){
-    lanuage = "Other";
+    language = "Other";
   }
   else if(FilmListCategery.Tamil == filmListCategery){
-    lanuage = "Tamil";
+    language = "Tamil";
   }
-  return lanuage;
+  return language;
 }

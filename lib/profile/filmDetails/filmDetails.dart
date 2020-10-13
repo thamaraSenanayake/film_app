@@ -1,5 +1,6 @@
 import 'package:film_app/auth.dart';
 import 'package:film_app/database/databse.dart';
+import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/comment.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/comment/commetView.dart';
@@ -8,32 +9,41 @@ import 'package:film_app/profile/filmDetails/fullScreenVideo.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../const.dart';
 
-class FilmDeatils extends StatefulWidget {
+class FilmDetails extends StatefulWidget {
   final Film film;
   final Map<String, dynamic> profile;
-  FilmDeatils({Key key,@required this.film, this.profile}) : super(key: key);
+  FilmDetails({Key key,@required this.film, this.profile}) : super(key: key);
 
   @override
-  _FilmDeatilsState createState() => _FilmDeatilsState();
+  _FilmDetailsState createState() => _FilmDetailsState();
 }
 
-class _FilmDeatilsState extends State<FilmDeatils> {
+class _FilmDetailsState extends State<FilmDetails> {
   double _height = 0.0;
   double _width = 0.0;
-  List<Widget> _commentListwidget = [];
+  List<Widget> _commentListWidget = [];
   List<Widget> _relatedFilmList = [];
   List<Comment> _commentList = [];
   final _commentController = TextEditingController();
   Database database = Database();
+  bool _isFavorite = false;
+  Film _film;
   
-
   YoutubePlayerController _controller;
 
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print("cant launch");
+    }
+  }
   @override
   void initState() { 
     super.initState();
@@ -44,8 +54,26 @@ class _FilmDeatilsState extends State<FilmDeatils> {
         mute: true,
       ),
     );
-    _loadCommnet();
+    _loadData();
+  }
+
+  _loadData() async {
+    _film = widget.film;
+    if(widget.film.commentList == null){
+      _film = await database.getMovie(widget.film.id);
+    }
+    _loadComment();
     _relatedFilmLoad();
+    _favoriteCheck();
+
+  }
+
+  _favoriteCheck() async{
+    _isFavorite = await DBProvider.db.isLiked(_film);
+    setState(() {
+      
+    });
+    print(_isFavorite);
   }
 
   _relatedFilmLoad(){
@@ -69,26 +97,26 @@ class _FilmDeatilsState extends State<FilmDeatils> {
 
   }
 
-  _loadCommnet(){
-    _commentList = widget.film.commentList;
-    _displayCommnet();
+  _loadComment(){
+    _commentList = _film.commentList;
+    _displayComment();
   }
 
-  _displayCommnet(){
-    List<Widget> _commentListwidgetTemp = [];
+  _displayComment(){
+    List<Widget> _commentListWidgetTemp = [];
     for (var item in _commentList) {
-      _commentListwidgetTemp.add(
+      _commentListWidgetTemp.add(
         CommentView(comment:item)
       );
     }
 
     setState(() {
-      _commentListwidget = _commentListwidgetTemp;
+      _commentListWidget = _commentListWidgetTemp;
     });
 
   }
 
-  _postCommnet(){
+  _postComment(){
     if(widget.profile == null){
       authservice.googleSignIn();
       return;
@@ -103,8 +131,8 @@ class _FilmDeatilsState extends State<FilmDeatils> {
       );
       _commentController.text = "";
       FocusScope.of(context).unfocus();
-      _displayCommnet();
-      database.addComment(_commentList, widget.film.id.toString());
+      _displayComment();
+      database.addComment(_commentList, _film.id.toString());
     }
   }
   
@@ -165,11 +193,19 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                       padding: const EdgeInsets.only(bottom:10.0,right: 15),
                       child: Align(
                         alignment: Alignment.bottomRight,
-                        child: Container(
-                          child: Icon(
-                            Icons.favorite_border,
-                            color: ColorList.Black,
-                            size: 28,
+                        child: GestureDetector(
+                          onTap: (){
+                            setState(() {
+                              _isFavorite = !_isFavorite;
+                            });
+                            DBProvider.db.likeUnLikeFilm(_film, _isFavorite== true?1:0);
+                          },
+                          child: Container(
+                            child: Icon(
+                              _isFavorite? Icons.favorite:Icons.favorite_border,
+                              color: ColorList.Black,
+                              size: 28,
+                            ),
                           ),
                         ),
                       ),
@@ -181,7 +217,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                         alignment: Alignment.bottomLeft,
                         child: Container(
                           child: Text(
-                            widget.film.name,
+                            _film.name,
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.w800,
@@ -263,7 +299,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                           ],
                                         ),
                                         child: Image.network(
-                                          widget.film.imgUrl,
+                                          _film.imgUrl,
                                           fit: BoxFit.cover,
                                         ),
                                         
@@ -280,7 +316,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                           Navigator.of(context).push(
                                             PageRouteBuilder(
                                               pageBuilder: (context, _, __) => FullScreenVideo(
-                                                videoUrl: widget.film.videoUrl,
+                                                videoUrl: _film.videoUrl,
                                               ),
                                               opaque: false
                                             ),
@@ -297,7 +333,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                     ),
                                   ),
 
-                                  //filem name
+                                  //film name
                                   Padding(
                                     padding: EdgeInsets.only(left:158,top:150),
                                     child: Container(
@@ -308,7 +344,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                         child: Column(
                                           children: <Widget>[
                                             Text(
-                                              widget.film.name,
+                                              _film.name,
                                               style: TextStyle(
                                                 color: Colors.red,
                                                 fontSize: 23,
@@ -326,7 +362,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                                   child:Center(
                                                     child: RichText(
                                                       text: TextSpan(
-                                                        text: widget.film.ratings.toString()+" / ",
+                                                        text: _film.ratings.toString()+" / ",
                                                         style: TextStyle(
                                                           fontSize: 25,
                                                           fontWeight: FontWeight.w800,
@@ -353,7 +389,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                     children: <Widget>[
                                                       Text(
-                                                        filmLanguageToString(widget.film.lanuage) +" - "+ filmGenaricToString(widget.film.genaric),
+                                                        filmLanguageToString(_film.lanuage) +" - "+ filmGenaricToString(_film.genaric),
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight: FontWeight.w500,
@@ -378,7 +414,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                               padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
                               child: Container(
                                 child:Text(
-                                  widget.film.description,
+                                  _film.description,
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
@@ -396,9 +432,28 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                               child: Container(
                                 height: 200,
                                 width: _width-50,
-                                child: WebView(
-                                  initialUrl: "https://film-c6ade.web.app/",
-                                  javascriptMode: JavascriptMode.unrestricted,
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      height: 200,
+                                      width: _width-50,
+                                      child: WebView(
+                                        initialUrl: "https://film-c6ade.web.app/",
+                                        javascriptMode: JavascriptMode.unrestricted,
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: (){
+                                        print("on tap");
+                                        _launchURL("https://drive.google.com/file/d/1F2ZYX-2BlN2yDLIKK_jBcDby8-cJi3kb/view?usp=sharing");
+                                      },
+                                      child: Container(
+                                        height: 200,
+                                        width: _width-50,
+                                        color: Colors.black.withOpacity(0.1),
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
@@ -418,7 +473,7 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                             Column(
                               children: <Widget>[
                                 Column(
-                                  children: _commentListwidget
+                                  children: _commentListWidget
                                 ),
 
                                 Card(
@@ -451,13 +506,13 @@ class _FilmDeatilsState extends State<FilmDeatils> {
                                                 // _englishtitleErrorRemove();
                                               },
                                               onSubmitted: (value){
-                                                _postCommnet();
+                                                _postComment();
                                               },
                                             ),
                                           ),
                                           GestureDetector(
                                             onTap: (){
-                                              _postCommnet();
+                                              _postComment();
                                             },
                                             child: Container(
                                               width: 80,

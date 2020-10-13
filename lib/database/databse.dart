@@ -73,8 +73,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -117,8 +117,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -159,8 +159,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList:commentList
@@ -253,8 +253,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -297,8 +297,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -339,8 +339,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -382,8 +382,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -425,8 +425,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -468,8 +468,8 @@ class Database{
         imgUrl:item["imgUrl"],
         ratings:item["ratings"],
         description:item["description"],
-        genaric: filmGenaricConvert(item["genaric"]),
-        lanuage:filmListCategeryConvert(item["lanuage"]),
+        genaric: filmGenericConvert(item["genaric"]),
+        lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
         commentList: commentList
@@ -479,6 +479,55 @@ class Database{
 
 
     return filmList;
+  }
+
+  Future<int> getSystemData() async{
+    int done = 0;
+
+    await systemData.document('settings').get().then((document){
+      AppData.email = document['email'];
+      AppData.appIdAndroid = document['appId'];
+      AppData.addIdAndroid = document['addId'];
+      done = 1;
+    });
+
+    return done;
+
+  }
+
+  Future<Film> getMovie(int id) async{
+    Film film;
+    List<Comment> commentList = [];
+    await filmCollection.document(id.toString()).get().then((document){
+        
+        if(document["comment"] != null){
+          for (var item in document["comment"]) {
+            commentList.add(
+              Comment(
+                comment: item["comment"],
+                firstName: item["name"].toString().split(" ")[0],
+                lastName: item["name"].toString().split(" ")[1]
+              )
+            );
+          }
+        }
+
+        film = Film(
+          name:document["name"],
+          year:document["year"],
+          imgUrl:document["imgUrl"],
+          ratings:document["ratings"],
+          description:document["description"],
+          genaric: filmGenericConvert(document["genaric"]),
+          lanuage:filmListCategoryConvert(document["lanuage"]),
+          id:document["id"],
+          videoUrl: document["videoUrl"],
+          commentList: commentList
+        );
+
+    });
+
+    return film;
   }
 
   

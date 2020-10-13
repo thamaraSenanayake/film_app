@@ -1,5 +1,6 @@
 import 'package:awesome_loader/awesome_loader.dart';
 import 'package:film_app/database/databse.dart';
+import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
@@ -9,10 +10,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../const.dart';
+import '../homePage.dart';
 
 class FilmList extends StatefulWidget {
   final FilmListCategery filmListCategery;
-  FilmList({Key key,@required this.filmListCategery}) : super(key: key);
+  final HomePageListener listener;
+  FilmList({Key key,@required this.filmListCategery,@required this.listener}) : super(key: key);
 
   @override
   _FilmListState createState() => _FilmListState();
@@ -49,8 +52,6 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
   }
 
   _scrollListener(){
-    print(_controller.position.atEdge);
-    print(_controller.position.userScrollDirection);
     if(_controller.position.atEdge && _controller.position.userScrollDirection == ScrollDirection.reverse){
       _nextFilm();
     }
@@ -80,7 +81,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
 
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
-        GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+        GridItem(film: item, gridItemListener: this, index: _filmList.indexOf(item))
       );
     }
 
@@ -103,14 +104,17 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
     _filmList = [];
     List<Widget> _filmListWidgetTemp =[]; 
     
-    if(widget.filmListCategery == FilmListCategery.NewlyAdd ){
+    if(widget.filmListCategery == FilmListCategery.RecentlyView){
+      _filmList = await DBProvider.db.recentFilmList();
+    }
+    else if(widget.filmListCategery == FilmListCategery.NewlyAdd ){
       _filmList = await database.newFilms(AppData.pagesize);
     }else{
       _filmList = await database.allMovies(widget.filmListCategery, AppData.pagesize);
     }
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
-        GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+        GridItem(film: item, gridItemListener: this, index: _filmList.indexOf(item))
       );
     }
     if(_filmList.length == AppData.pagesize){
@@ -138,10 +142,10 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
     }
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
-        GridItem(film: item, gridItemListner: this, index: _filmList.indexOf(item))
+        GridItem(film: item, gridItemListener: this, index: _filmList.indexOf(item))
       );
     }
-    if(_filmList.length == AppData.pagesize){
+    if(_filmList.length == AppData.pagesize && widget.filmListCategery != FilmListCategery.NewlyAdd){
       _filmListWidgetTemp.add(
         AwesomeLoader(
           loaderType: AwesomeLoader.AwesomeLoader3,
@@ -364,6 +368,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                     SizedBox(
                       height: 20,
                     ),
+                    widget.filmListCategery != FilmListCategery.RecentlyView?
                     Container(
                       height: 50,
                       width: _width,
@@ -444,7 +449,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                               child: GestureDetector(
                                 onTap: (){
                                   setState(() {
-                                    filmGenaricList = FilmGenaricList.Advenure;
+                                    filmGenaricList = FilmGenaricList.Adventure;
                                   _loading = true;
                                   });
                                   _loadGenaric();
@@ -455,7 +460,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(3)
                                     ),
-                                    color: filmGenaricList == FilmGenaricList.Advenure? ColorList.Red:Colors.white
+                                    color: filmGenaricList == FilmGenaricList.Adventure? ColorList.Red:Colors.white
                                   ),
                                   child: Center(
                                     child: Padding(
@@ -463,7 +468,7 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                                       child: Text(
                                         "Adventure",
                                         style:TextStyle(
-                                          color: filmGenaricList == FilmGenaricList.Advenure? Colors.white:ColorList.Black,
+                                          color: filmGenaricList == FilmGenaricList.Adventure? Colors.white:ColorList.Black,
                                           fontSize: 15
                                         )
                                       ),
@@ -541,6 +546,24 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
                           ],
                         ),
                       ),
+                    ):GestureDetector(
+                      onTap: (){
+                        DBProvider.db.deleteHistory();
+                        widget.listener.reloadFilms();
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: 50,
+                        width: _width,
+                        child: Text(
+                          "Delete All History",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
                     ),
                     SizedBox(height: 20,),
 
@@ -603,9 +626,10 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
 
   @override
   gridItemListner(Film film) {
+    DBProvider.db.addRecentlyViewFilm(film); 
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, _, __) => FilmDeatils(
+        pageBuilder: (context, _, __) => FilmDetails(
           film: film,
         ),
         opaque: false
