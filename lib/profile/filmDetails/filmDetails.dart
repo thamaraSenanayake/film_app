@@ -1,3 +1,4 @@
+import 'package:awesome_loader/awesome_loader.dart';
 import 'package:film_app/auth.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
@@ -5,6 +6,7 @@ import 'package:film_app/model/comment.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/module/comment/commetView.dart';
 import 'package:film_app/module/relatedMovie/relatedMovieItem.dart';
+import 'package:film_app/module/relatedMovie/relatedMovieListner.dart';
 import 'package:film_app/profile/filmDetails/fullScreenVideo.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,7 @@ class FilmDetails extends StatefulWidget {
   _FilmDetailsState createState() => _FilmDetailsState();
 }
 
-class _FilmDetailsState extends State<FilmDetails> {
+class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListener {
   double _height = 0.0;
   double _width = 0.0;
   List<Widget> _commentListWidget = [];
@@ -34,10 +36,12 @@ class _FilmDetailsState extends State<FilmDetails> {
   Database database = Database();
   bool _isFavorite = false;
   Film _film;
+  bool _loading = false;
   
   YoutubePlayerController _controller;
 
   _launchURL(String url) async {
+    print(url);
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -47,8 +51,9 @@ class _FilmDetailsState extends State<FilmDetails> {
   @override
   void initState() { 
     super.initState();
+    _film = widget.film;
     _controller = YoutubePlayerController(
-      initialVideoId: widget.film.videoUrl.split("=")[1],
+      initialVideoId: _film.videoUrl.split("=")[1],
       flags: YoutubePlayerFlags(
         autoPlay: false,
         mute: true,
@@ -58,9 +63,9 @@ class _FilmDetailsState extends State<FilmDetails> {
   }
 
   _loadData() async {
-    _film = widget.film;
-    if(widget.film.commentList == null){
-      _film = await database.getMovie(widget.film.id);
+    _film = _film;
+    if(_film.commentList == null){
+      _film = await database.getMovie(_film.id);
     }
     _loadComment();
     _relatedFilmLoad();
@@ -76,19 +81,13 @@ class _FilmDetailsState extends State<FilmDetails> {
     print(_isFavorite);
   }
 
-  _relatedFilmLoad(){
+  _relatedFilmLoad() async {
     List<Widget> _relatedFilmListTemp = [];
-    List<Film> _filmList = [];
+    List<Film> _filmList = await database.moviesWithGenaric(_film.lanuage, _film.genaric, 3);
     
-    _filmList.add(Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
-    _filmList.add(Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
-    _filmList.add(Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
-    _filmList.add(Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
-    _filmList.add(Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Drama,lanuage: FilmListCategery.English));
-
     for (var item in _filmList) {
       _relatedFilmListTemp.add(
-        RelatedMovieView(film:item)
+        RelatedMovieView(film:item,listener: this,)
       );
     }
     setState(() {
@@ -233,6 +232,16 @@ class _FilmDetailsState extends State<FilmDetails> {
               ),
 
               //page container
+              _loading?
+                Container(
+                width:_width,
+                height: _height - 100,
+                color: ColorList.Black.withOpacity(0.5),
+                child:AwesomeLoader(
+                  loaderType: AwesomeLoader.AwesomeLoader3,
+                  color: ColorList.Red,
+                ),
+              ):
               Container(
                 width:_width,
                 height: _height - 100,
@@ -445,7 +454,7 @@ class _FilmDetailsState extends State<FilmDetails> {
                                     GestureDetector(
                                       onTap: (){
                                         print("on tap");
-                                        _launchURL("https://drive.google.com/file/d/1F2ZYX-2BlN2yDLIKK_jBcDby8-cJi3kb/view?usp=sharing");
+                                        _launchURL(_film.filmUrl);
                                       },
                                       child: Container(
                                         height: 200,
@@ -584,5 +593,18 @@ class _FilmDetailsState extends State<FilmDetails> {
         ),
       ),
     );
+  }
+
+  @override
+  relatedMovieClick(Film film) async {
+    print("click");
+    setState(() {
+      _loading = true;
+    });
+    await new Future.delayed(const Duration(seconds : 1));
+    setState(() {
+      _loading = false;
+      _film = film;
+    });
   }
 }

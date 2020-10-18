@@ -14,6 +14,7 @@ class Film{
   final String videoUrl;
   final bool topMovie;
   final List<Comment> commentList;
+  final String filmUrl;
 
-  Film({this.commentList, this.topMovie, this.videoUrl,this.id,this.name, this.year, this.imgUrl, this.ratings, this.description, this.genaric, this.lanuage});
+  Film({this.filmUrl, this.commentList, this.topMovie, this.videoUrl,this.id,this.name, this.year, this.imgUrl, this.ratings, this.description, this.genaric, this.lanuage});
 }

@@ -11,7 +11,9 @@ import 'package:film_app/module/gridItem/gridTitle.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
 import 'package:film_app/profile/filmList.dart/filmList.dart';
 import 'package:film_app/profile/filmList.dart/filmListFavourite.dart';
+import 'package:film_app/profile/filmList.dart/filmListSearch.dart';
 import 'package:film_app/profile/settings.dart';
+import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/rendering.dart';
@@ -29,13 +31,6 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-final List<String> imgList = [
-  'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',
-  'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',
-  'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',
-  'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',
-  'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',
-];
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin  implements GridItemListner,HomePageListener { 
   double _height = 0.0;
   double _width = 0.0;
@@ -68,15 +63,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   final _searchController = TextEditingController();
   final storage = new FlutterSecureStorage();
   Database database = Database();
-
-  List<Film> _filmList = [
-    // Film(imgUrl:'https://www.joblo.com/assets/images/joblo/posters/2019/08/1vso0vrm42j31.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    // Film(imgUrl:'https://i.pinimg.com/originals/e2/ed/27/e2ed27aff80b916e5dfb3d360779415b.png',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    // Film(imgUrl:'https://www.vantunews.com/storage/app/1578232810-fordvsferrari.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    // Film(imgUrl:'https://media-cache.cinematerial.com/p/500x/qcjprk2e/deadpool-2-movie-poster.jpg?v=1540913690',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-    // Film(imgUrl:'https://images-na.ssl-images-amazon.com/images/I/61c8%2Bf32PJL._AC_SY679_.jpg',name: "film Name",ratings: 7.8,genaric: FilmGenaricList.Action,lanuage: FilmListCategery.English),
-  ];
-
 
  
   @override
@@ -327,96 +313,112 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   _loadSlider() async{
-    //List<Film> filmList = await database.getTopFiveFilms();
-    // print(filmList[0].name);
+    List<Film> topFilmList = await database.getTopFiveFilms();
     List<Widget> _imageListTemp = [];
-    for (var item in imgList) {
+    for (var item in topFilmList) {
       _imageListTemp.add(
-        Container(
-          height: _height - 100,
-          width: _width,
-          color: Colors.white,
-          child: Stack(
-            children: <Widget>[
-              Container(
-                height: _height - 100,
-                width: _width,
-                child: Image.network(
-                  item,
-                  fit: BoxFit.cover
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: 100,
+        GestureDetector(
+          onTap: (){
+            gridItemListner(item);
+          },
+          child: Container(
+            height: _height - 100,
+            width: _width,
+            color: Colors.white,
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  height: _height - 100,
                   width: _width,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        ColorList.Black,
-                        ColorList.Black.withOpacity(0.5), 
-                        ColorList.Black.withOpacity(0.9), 
-                      ]
-                    )
+                  child: Image.network(
+                    item.imgUrl,
+                    fit: BoxFit.cover
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              "Film Name",
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white
-                              ),
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                text: '7.7 / ',
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: 100,
+                    width: _width,
+                    decoration: BoxDecoration(
+                      color: ColorList.Black.withOpacity(0.5),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                item.name,
                                 style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w800,
                                   color: Colors.white
                                 ),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: '10', 
+                              ),
+                              RichText(
+                                text: TextSpan(
+                                  text: item.ratings.toString()+'/ ',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white
+                                  ),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: '10', 
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal:10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                filmLanguageToString(item.lanuage) +" - "+filmGenaricToString(item.genaric),
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: (){
+                                  gridItemListner(item);
+                                },
+                                child: Container(
+                                  child: Text(
+                                    "More details ...",
                                     style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
                                       color: Colors.white
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal:10.0),
-                        child: Text(
-                          "English - Action",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         )
       );
@@ -441,6 +443,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
   _search(){
+    if(_searchController.text.isNotEmpty){
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          pageBuilder: (context, _, __) => FilmListSearch(searchKey:_searchController.text),
+          opaque: false
+        ),
+      );
+    }
     setState(() {
       _showSearchText = false;
     });
@@ -808,7 +818,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       aspectRatio: 1.0,
                                       enlargeCenterPage: true,
                                       height: _height - 100,
-                                      viewportFraction:1
+                                      viewportFraction:1,
+                                      autoPlayAnimationDuration: Duration(seconds:3)
                                     ),
                                     items: _imageList,
                                   ),
