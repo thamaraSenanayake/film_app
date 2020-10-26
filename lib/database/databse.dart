@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:film_app/model/comment.dart';
+import 'package:film_app/model/episode.dart';
 import 'package:film_app/model/film.dart';
-import 'package:film_app/profile/filmList.dart/filmList.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/res/typeConvert.dart';
 
 import '../const.dart';
@@ -10,6 +11,7 @@ class Database{
   
   //collection refreence 
   final CollectionReference filmCollection = Firestore.instance.collection('film');
+  final CollectionReference tvSeriesCollection = Firestore.instance.collection('tvSeries');
   final CollectionReference topFilmCollection = Firestore.instance.collection('topFilm');
   final CollectionReference systemData = Firestore.instance.collection('systemData');
 
@@ -100,6 +102,53 @@ class Database{
 
 
     return filmList;
+  }
+
+  List<TvSeries> setTvSeriesList(QuerySnapshot querySnapshot){
+    List<TvSeries> tvSeriesList = [];
+    TvSeries tvSeries;
+
+    for (var item in querySnapshot.documents) {
+      List<Comment> commentList = [];
+      List<Episode> episodeList = [];
+      AppData.lastVisible = item;
+      if(item["comment"] != null){
+        for (var item in item["comment"]) {
+          commentList.add(
+            Comment(
+              comment: item["comment"],
+              firstName: item["name"].toString().split(" ")[0],
+              lastName: item["name"].toString().split(" ")[1]
+            )
+          );
+        }
+      }
+      if(item["episode"] != null){
+        for (var item in item["episode"]) {
+          episodeList.add(
+            Episode(
+              seasonName: item["seasonName"],
+              epiUrl: item["name"].epiUrl(),
+            )
+          );
+        }
+      }
+      tvSeries = TvSeries(
+        name:item["name"],
+        year:item["year"],
+        imgUrl:item["imgUrl"],
+        ratings:item["ratings"],
+        description:item["description"],
+        lanuage:filmListCategoryConvert(item["lanuage"]),
+        id:item["id"],
+        videoUrl: item["videoUrl"],
+        commentList: commentList
+      );
+      tvSeriesList.add(tvSeries);
+    }
+
+
+    return tvSeriesList;
   }
 
   Future<List<Film>> newFilmsNext(int limit) async{
@@ -300,6 +349,55 @@ class Database{
     return film;
   }
 
+  Future<TvSeries> getTvSeries(int id) async{
+    TvSeries tvSeries;
+    List<Comment> commentList = [];
+    List<Episode> episodeList = [];
+    await tvSeriesCollection.document(id.toString()).get().then((document){
+        
+        if(document["comment"] != null){
+          for (var item in document["comment"]) {
+            commentList.add(
+              Comment(
+                comment: item["comment"],
+                firstName: item["name"].toString().split(" ")[0],
+                lastName: item["name"].toString().split(" ")[1]
+              )
+            );
+          }
+        }
+
+        if(document["episode"] != null){
+          for (var item in document["episode"]) {
+            episodeList.add(
+              Episode(
+                seasonName: item["seasonName"],
+                epiUrl: item["name"].epiUrl(),
+              )
+            );
+          }
+        }
+
+        tvSeries = TvSeries(
+          name:document["name"],
+          year:document["year"],
+          imgUrl:document["imgUrl"],
+          ratings:document["ratings"],
+          description:document["description"],
+          lanuage:filmListCategoryConvert(document["lanuage"]),
+          id:document["id"],
+          videoUrl: document["videoUrl"],
+          commentList: commentList,
+          episodeList: episodeList
+        );
+
+    });
+
+    return tvSeries;
+  }
+
+  
+
 
   Future<List<Film>> searchAll(String key) async{
     key=key.toLowerCase();
@@ -322,7 +420,44 @@ class Database{
 
     return setFilmList(querySnapshot);
   }
-  
+
+  Future<List<TvSeries>> allTvSeries() async{
+    QuerySnapshot querySnapshot;
+    querySnapshot = await tvSeriesCollection
+    .getDocuments();
+
+    return setTvSeriesList(querySnapshot);
+  }
+
+  Future<List<TvSeries>> languageTvSeries(FilmListCategery category) async{
+    QuerySnapshot querySnapshot;
+    querySnapshot = await tvSeriesCollection
+    .where("lanuage",isEqualTo: category.toString())
+    .getDocuments();
+
+    return setTvSeriesList(querySnapshot);
+  }
+
+  Future<List<TvSeries>> allTvSeriesSearch(String key) async{
+    QuerySnapshot querySnapshot;
+    querySnapshot = await tvSeriesCollection
+    .where('search',arrayContainsAny: [key])
+    .getDocuments();
+
+    return setTvSeriesList(querySnapshot);
+  }
+
+  Future<List<TvSeries>> languageTvSeriesSearch(FilmListCategery category,String key) async{
+    QuerySnapshot querySnapshot;
+    querySnapshot = await tvSeriesCollection
+    .where('search',arrayContainsAny: [key])
+    .where("lanuage",isEqualTo: category.toString())
+    .getDocuments();
+
+    return setTvSeriesList(querySnapshot);
+  }
+
+
 
 
 }

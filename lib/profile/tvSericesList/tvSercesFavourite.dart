@@ -2,6 +2,7 @@ import 'package:awesome_loader/awesome_loader.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
@@ -11,49 +12,41 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../const.dart';
 
-class FilmListSearch extends StatefulWidget {
-  final String searchKey;
-  final FilmListCategery category;
-  FilmListSearch({Key key,@required this.searchKey, this.category}) : super(key: key);
+class TvSeriesFavorite extends StatefulWidget {
+  TvSeriesFavorite({Key key}) : super(key: key);
 
   @override
-  _FilmListSearchState createState() => _FilmListSearchState();
+  _TvSeriesFavoriteState createState() => _TvSeriesFavoriteState();
 }
 
-class _FilmListSearchState extends State<FilmListSearch> implements GridItemListner{
+class _TvSeriesFavoriteState extends State<TvSeriesFavorite> implements GridItemListner{
   double _height = 0.0;
   double _width = 0.0;
   bool _loading = true;
-  List<Widget> _filmListWidget =[];
-  List<Film> _filmList = [];
-  Database _database;
+  List<Widget> _tvSeriesWidget =[];
+  List<TvSeries> _tvSeries = [];
+
 
   @override
   void initState() {
     super.initState();
-    _database = Database();
     _loadFilms();
   }
 
   _loadFilms() async{
-    _filmList = [];
-    List<Widget> _filmListWidgetTemp =[]; 
-
-    if(widget.category == null || widget.category == FilmListCategery.NewlyAdd){
-      _filmList = await _database.searchAll(widget.searchKey);
-    }else{
-      _filmList = await _database.searchLanguage(widget.searchKey,widget.category);
-    }
+    _tvSeries = [];
+    List<Widget> _tvSeriesWidgetTemp =[]; 
     
+    _tvSeries = await DBProvider.db.favoriteTvSerriesList(MainType.Film);
 
-    for (var item in _filmList) {
-      _filmListWidgetTemp.add(
-        GridItem(film: item, gridItemListener: this, index: _filmList.indexOf(item))
+    for (var item in _tvSeries) {
+      _tvSeriesWidgetTemp.add(
+        GridItem(film: null,tvSeries: item, gridItemListener: this, index: _tvSeries.indexOf(item))
       );
     }
     
     setState(() {
-      _filmListWidget = _filmListWidgetTemp;
+      _tvSeriesWidget = _tvSeriesWidgetTemp;
       _loading = false;
     });
 
@@ -98,14 +91,13 @@ class _FilmListSearchState extends State<FilmListSearch> implements GridItemList
                     ),
                   ),
 
-
                   Padding(
                     padding: const EdgeInsets.only(bottom:10.0),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         child: Text(
-                          "Search Result",
+                          "Favorite TV Series",
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.w800,
@@ -129,23 +121,11 @@ class _FilmListSearchState extends State<FilmListSearch> implements GridItemList
                 removeTop: true,
                 child: ListView(
                   children: <Widget>[
-                    
                     SizedBox(
-                      height: 40,
-
-                      child: Padding(
-                        padding: const EdgeInsets.only(top:10.0,left: 20),
-                        child: Text(
-                          "Search Result for "+widget.searchKey+" ....",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      )
+                      height: 20,
                     ),
+                    
+                    SizedBox(height: 20,),
 
                     _loading?Container(
                       height: _height,
@@ -167,31 +147,11 @@ class _FilmListSearchState extends State<FilmListSearch> implements GridItemList
                           crossAxisSpacing: 0,
                           mainAxisSpacing: 0,
                           crossAxisCount: 2,
-                          children: _filmListWidget
+                          children: _tvSeriesWidget
                         ),
                       ),
                     ),
                     
-                    // Container(
-                    //           height: 50,
-                    //           width: _width,
-                    //           child: Align(
-                    //             alignment: Alignment.centerRight,
-                    //             child: Container(
-                    //               decoration: BoxDecoration(
-                    //                 shape: BoxShape.circle,
-                    //                 color: ColorList.Red
-                    //               ),
-                    //               child: Padding(
-                    //                 padding: EdgeInsets.all(4),
-                    //                 child: Icon(
-                    //                   Icons.arrow_forward,
-                    //                   color: ColorList.Black,
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         )
 
                   ],
                 )
@@ -219,6 +179,11 @@ class _FilmListSearchState extends State<FilmListSearch> implements GridItemList
 
   @override
   gridItemTitleClick(FilmListCategery filmListCategery) {
+    
+  }
+
+  @override
+  gridItemTVSerriesListener(TvSeries tvSeries) {
     
   }
 }

@@ -1,4 +1,5 @@
 import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,10 @@ import '../../const.dart';
 
 class GridItem extends StatefulWidget {
   final Film film;
+  final TvSeries tvSeries; 
   final GridItemListner gridItemListener;
   final int index;
-  GridItem({Key key, @required this.film,@required this.gridItemListener,@required this.index}) : super(key: key);
+  GridItem({Key key, @required this.film,@required this.gridItemListener,@required this.index, this.tvSeries}) : super(key: key);
 
   @override
   _GridItemState createState() => _GridItemState();
@@ -32,7 +34,9 @@ class _GridItemState extends State<GridItem> {
         child: FadeInAnimation(
           child: GestureDetector(
             onTap: (){
-              widget.gridItemListener.gridItemListner(widget.film);
+              if(widget.film != null){
+                widget.gridItemListener.gridItemListner(widget.film);
+              }
             },
             child: Container(
               child: Stack(
@@ -42,7 +46,7 @@ class _GridItemState extends State<GridItem> {
                     height: _width,
                     width: _width,
                       child: Image.network(
-                        widget.film.imgUrl,
+                        widget.film != null? widget.film.imgUrl:widget.tvSeries.imgUrl,
                         fit: BoxFit.cover,
                       ),
                   ),
@@ -68,7 +72,7 @@ class _GridItemState extends State<GridItem> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              widget.film.name,
+                              widget.film != null?widget.film.name:widget.tvSeries.name,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18
@@ -79,16 +83,16 @@ class _GridItemState extends State<GridItem> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
-                                Text(
+                                widget.film != null? Text(
                                   filmGenaricToString(widget.film.genaric),
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15
                                   ),
-                                ),
+                                ):Container(),
                                 RichText(
                                   text: TextSpan(
-                                    text: widget.film.ratings.toString()+" / ",
+                                    text:widget.film != null ? widget.film.ratings.toString():widget.tvSeries.ratings.toString()+" / ",
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,

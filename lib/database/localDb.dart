@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../const.dart';
 
 
 class DBProvider {
@@ -35,11 +38,12 @@ class DBProvider {
   initDB() async {
     
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "filmApp.db");
+    String path = join(documentsDirectory.path, "filmApp1.db");
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("CREATE TABLE Film ("
           "id INTEGER PRIMARY KEY,"
+          "type TEXT PRIMARY KEY,"
           "name TEXT NOT NULL,"
           "year TEXT NOT NULL,"
           "imgUrl TEXT NOT NULL,"
@@ -56,14 +60,14 @@ class DBProvider {
     });
   }
 
-  likeUnLikeFilm(Film film,int likeUnLike) async {
+  likeUnLikeFilm(int id,int likeUnLike,MainType type) async {
     final db = await database;
     var res = 'done';
 
     
 
     try {
-      await db.execute("UPDATE `Film` SET `likedFilm`=1, `timeStampFavorite` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+film.id.toString());
+      await db.execute("UPDATE `Film` SET `likedFilm`=1, `timeStampFavorite` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+id.toString()+"and type ="+type.toString());
     } catch (e) {
       print(e);
       return e.toString();
@@ -78,7 +82,7 @@ class DBProvider {
     int count = 0; 
 
     try {
-      var res = await db.rawQuery("Select * from Film where id=" +film.id.toString());
+      var res = await db.rawQuery("Select * from Film where id=" +film.id.toString()+"and type = "+MainType.Film.toString());
       count = res.length;
       
     } catch (e) {
@@ -89,9 +93,11 @@ class DBProvider {
     try {
       if(count == 0){
         await db.execute(
-          "INSERT INTO `Film`( `id`,`name`,`year`,`imgUrl`,`ratings`,`description`,`genaric`,`lanuage`,`videoUrl`,`timeStampRecently`,`recentFilm`,`likedFilm`) VALUES (" +
+          "INSERT INTO `Film`( `id`,`type`,`name`,`year`,`imgUrl`,`ratings`,`description`,`genaric`,`lanuage`,`videoUrl`,`timeStampRecently`,`recentFilm`,`likedFilm`) VALUES (" +
               film.id.toString()+
               ",'" +
+              MainType.Film.toString()+
+              "','" +
               film.name+
               "','" +
               film.year+
@@ -115,7 +121,7 @@ class DBProvider {
               ")"
         );
       }else{
-        await db.execute("UPDATE `Film` SET `recentFilm`=1, `timeStampRecently` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+film.id.toString());
+        await db.execute("UPDATE `Film` SET `recentFilm`=1, `timeStampRecently` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+film.id.toString()+" and type ="+MainType.Film.toString());
       }
     } catch (e) {
       print(e);
@@ -140,13 +146,13 @@ class DBProvider {
   }
 
 
-  isLiked(Film film) async {
+  isLiked(int id,MainType type) async {
     final db = await database;
     var res = 'done';
     int count = 0; 
 
     try {
-      var res = await db.rawQuery("Select * from Film where id=" +film.id.toString()+" and likedFilm =1");
+      var res = await db.rawQuery("Select * from Film where id=" +id.toString()+" and likedFilm =1 and type="+type.toString());
       count = res.length;
       
     } catch (e) {
@@ -167,7 +173,7 @@ class DBProvider {
     final db = await database;
 
     try {
-      var res = await db.rawQuery("Select * from film where recentFilm= 1 order by timeStampRecently desc");
+      var res = await db.rawQuery("Select * from film where recentFilm= 1 and type="+MainType.Film.toString()+" order by timeStampRecently desc");
       for (var item in res) {
         filmList.add(
           Film(
@@ -190,12 +196,12 @@ class DBProvider {
     return filmList;
   }
 
-  Future<List<Film>> favoriteFilmList() async {
+  Future<List<Film>> favoriteList(MainType mainType) async {
     List<Film> filmList = [];
     final db = await database;
 
     try {
-      var res = await db.rawQuery("Select * from film where likedFilm= 1 order by timeStampFavorite desc");
+      var res = await db.rawQuery("Select * from film where mainType ="+mainType.toString()+" and likedFilm= 1 order by timeStampFavorite desc");
       for (var item in res) {
         filmList.add(
           Film(
@@ -216,6 +222,33 @@ class DBProvider {
       // return e.toString();
     }
     return filmList;
+  }
+
+  Future<List<TvSeries>> favoriteTvSerriesList(MainType mainType) async {
+    List<TvSeries> tvSeriesList = [];
+    final db = await database;
+
+    try {
+      var res = await db.rawQuery("Select * from film where mainType ="+mainType.toString()+" and likedFilm= 1 order by timeStampFavorite desc");
+      for (var item in res) {
+        tvSeriesList.add(
+          TvSeries(
+            id: item["id"],
+            name: item["name"],
+            year: item["year"],
+            imgUrl: item["imgUrl"],
+            ratings: double.parse(item["ratings"]),
+            description: item["description"],
+            lanuage: filmListCategoryConvert(item["lanuage"]),
+            videoUrl: item["videoUrl"],
+          )
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      // return e.toString();
+    }
+    return tvSeriesList;
   }
 
 

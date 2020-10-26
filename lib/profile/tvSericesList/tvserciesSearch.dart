@@ -2,6 +2,7 @@ import 'package:awesome_loader/awesome_loader.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
@@ -11,32 +12,40 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../const.dart';
 
-class FilmListFavorite extends StatefulWidget {
-  FilmListFavorite({Key key}) : super(key: key);
+class TvSeriesSearch extends StatefulWidget {
+  final String searchKey;
+  final FilmListCategery category;
+  TvSeriesSearch({Key key,@required this.searchKey, this.category}) : super(key: key);
 
   @override
-  _FilmListFavoriteState createState() => _FilmListFavoriteState();
+  _TvSeriesSearchState createState() => _TvSeriesSearchState();
 }
 
-class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItemListner{
+class _TvSeriesSearchState extends State<TvSeriesSearch> implements GridItemListner{
   double _height = 0.0;
   double _width = 0.0;
   bool _loading = true;
   List<Widget> _filmListWidget =[];
   List<Film> _filmList = [];
-
+  Database _database;
 
   @override
   void initState() {
     super.initState();
+    _database = Database();
     _loadFilms();
   }
 
   _loadFilms() async{
     _filmList = [];
     List<Widget> _filmListWidgetTemp =[]; 
+
+    if(widget.category == null || widget.category == FilmListCategery.NewlyAdd){
+      _filmList = await _database.searchAll(widget.searchKey);
+    }else{
+      _filmList = await _database.searchLanguage(widget.searchKey,widget.category);
+    }
     
-    _filmList = await DBProvider.db.favoriteFilmList();
 
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
@@ -90,13 +99,14 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
                     ),
                   ),
 
+
                   Padding(
                     padding: const EdgeInsets.only(bottom:10.0),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         child: Text(
-                          "Favorite Movie",
+                          "Search Result",
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.w800,
@@ -120,11 +130,23 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
                 removeTop: true,
                 child: ListView(
                   children: <Widget>[
-                    SizedBox(
-                      height: 20,
-                    ),
                     
-                    SizedBox(height: 20,),
+                    SizedBox(
+                      height: 40,
+
+                      child: Padding(
+                        padding: const EdgeInsets.only(top:10.0,left: 20),
+                        child: Text(
+                          "Search Result for "+widget.searchKey+" ....",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      )
+                    ),
 
                     _loading?Container(
                       height: _height,
@@ -198,6 +220,11 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
 
   @override
   gridItemTitleClick(FilmListCategery filmListCategery) {
+    
+  }
+
+  @override
+  gridItemTVSerriesListener(TvSeries tvSeries) {
     
   }
 }

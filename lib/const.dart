@@ -45,3 +45,8 @@ enum FilmGenaricList{
   Bio,
   All
 }
+
+enum MainType{
+  Film,
+  TvSeries
+}

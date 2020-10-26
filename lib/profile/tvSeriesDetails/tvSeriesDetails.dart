@@ -3,39 +3,35 @@ import 'package:film_app/auth.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/comment.dart';
-import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/comment/commetView.dart';
-import 'package:film_app/module/relatedMovie/relatedMovieItem.dart';
-import 'package:film_app/module/relatedMovie/relatedMovieListner.dart';
 import 'package:film_app/profile/filmDetails/fullScreenVideo.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../const.dart';
 
-class FilmDetails extends StatefulWidget {
-  final Film film;
+class TvSeriesDetails extends StatefulWidget {
+  final TvSeries tvSeries;
   final Map<String, dynamic> profile;
-  FilmDetails({Key key,@required this.film, this.profile}) : super(key: key);
+  TvSeriesDetails({Key key,@required this.tvSeries, this.profile}) : super(key: key);
 
   @override
-  _FilmDetailsState createState() => _FilmDetailsState();
+  _TvSeriesStateDetails createState() => _TvSeriesStateDetails();
 }
 
-class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListener {
+class _TvSeriesStateDetails extends State<TvSeriesDetails> {
   double _height = 0.0;
   double _width = 0.0;
   List<Widget> _commentListWidget = [];
-  List<Widget> _relatedFilmList = [];
   List<Comment> _commentList = [];
   final _commentController = TextEditingController();
   Database database = Database();
   bool _isFavorite = false;
-  Film _film;
+  TvSeries _tvSeries;
   bool _loading = false;
   
   YoutubePlayerController _controller;
@@ -48,12 +44,13 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
       print("cant launch");
     }
   }
+  
   @override
   void initState() { 
     super.initState();
-    _film = widget.film;
+    _tvSeries = widget.tvSeries;
     _controller = YoutubePlayerController(
-      initialVideoId: _film.videoUrl.split("=")[1],
+      initialVideoId: _tvSeries.videoUrl.split("=")[1],
       flags: YoutubePlayerFlags(
         autoPlay: false,
         mute: true,
@@ -63,41 +60,25 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
   }
 
   _loadData() async {
-    _film = _film;
-    if(_film.commentList == null){
-      _film = await database.getMovie(_film.id);
+    if(_tvSeries.commentList == null){
+      _tvSeries = await database.getTvSeries(_tvSeries.id);
     }
     _loadComment();
-    _relatedFilmLoad();
     _favoriteCheck();
 
   }
 
   _favoriteCheck() async{
-    _isFavorite = await DBProvider.db.isLiked(_film.id,MainType.Film);
+    _isFavorite = await DBProvider.db.isLiked(_tvSeries.id,MainType.TvSeries);
     setState(() {
       
     });
     print(_isFavorite);
   }
 
-  _relatedFilmLoad() async {
-    List<Widget> _relatedFilmListTemp = [];
-    List<Film> _filmList = await database.moviesWithGenaric(_film.lanuage, _film.genaric, 3);
-    
-    for (var item in _filmList) {
-      _relatedFilmListTemp.add(
-        RelatedMovieView(film:item,listener: this,)
-      );
-    }
-    setState(() {
-      _relatedFilmList = _relatedFilmListTemp;
-    });
-
-  }
 
   _loadComment(){
-    _commentList = _film.commentList;
+    _commentList = _tvSeries.commentList;
     _displayComment();
   }
 
@@ -131,7 +112,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
       _commentController.text = "";
       FocusScope.of(context).unfocus();
       _displayComment();
-      database.addComment(_commentList, _film.id.toString());
+      database.addComment(_commentList, _tvSeries.id.toString());
     }
   }
   
@@ -197,7 +178,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                             setState(() {
                               _isFavorite = !_isFavorite;
                             });
-                            DBProvider.db.likeUnLikeFilm(_film.id, _isFavorite== true?1:0,MainType.Film);
+                            DBProvider.db.likeUnLikeFilm(_tvSeries.id, _isFavorite== true?1:0,MainType.TvSeries);
                           },
                           child: Container(
                             child: Icon(
@@ -216,7 +197,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                         alignment: Alignment.bottomLeft,
                         child: Container(
                           child: Text(
-                            _film.name,
+                            _tvSeries.name,
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.w800,
@@ -308,7 +289,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                           ],
                                         ),
                                         child: Image.network(
-                                          _film.imgUrl,
+                                          _tvSeries.imgUrl,
                                           fit: BoxFit.cover,
                                         ),
                                         
@@ -325,7 +306,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                           Navigator.of(context).push(
                                             PageRouteBuilder(
                                               pageBuilder: (context, _, __) => FullScreenVideo(
-                                                videoUrl: _film.videoUrl,
+                                                videoUrl: _tvSeries.videoUrl,
                                               ),
                                               opaque: false
                                             ),
@@ -353,7 +334,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                         child: Column(
                                           children: <Widget>[
                                             Text(
-                                              _film.name,
+                                              _tvSeries.name,
                                               style: TextStyle(
                                                 color: Colors.red,
                                                 fontSize: 23,
@@ -371,7 +352,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                                   child:Center(
                                                     child: RichText(
                                                       text: TextSpan(
-                                                        text: _film.ratings.toString()+" / ",
+                                                        text: _tvSeries.ratings.toString()+" / ",
                                                         style: TextStyle(
                                                           fontSize: 25,
                                                           fontWeight: FontWeight.w800,
@@ -398,7 +379,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                     children: <Widget>[
                                                       Text(
-                                                        filmLanguageToString(_film.lanuage) +" - "+ filmGenaricToString(_film.genaric),
+                                                        filmLanguageToString(_tvSeries.lanuage),
                                                         style: TextStyle(
                                                           fontSize: 15,
                                                           fontWeight: FontWeight.w500,
@@ -423,7 +404,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                               padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
                               child: Container(
                                 child:Text(
-                                  _film.description,
+                                  _tvSeries.description,
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
@@ -436,36 +417,6 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                               ),
                             ),
 
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 25),
-                              child: Container(
-                                height: 200,
-                                width: _width-50,
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: 200,
-                                      width: _width-50,
-                                      child: WebView(
-                                        initialUrl: "https://film-c6ade.web.app/",
-                                        javascriptMode: JavascriptMode.unrestricted,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: (){
-                                        print("on tap");
-                                        _launchURL(_film.filmUrl);
-                                      },
-                                      child: Container(
-                                        height: 200,
-                                        width: _width-50,
-                                        color: Colors.black.withOpacity(0.1),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
 
                             Padding(
                               padding: EdgeInsets.only(left: 10,top:20),
@@ -547,64 +498,18 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                               ],
                             ),
 
-                            Padding(
-                              padding: EdgeInsets.only(left: 10,top:20),
-                              child: Text(
-                                "Related Movies",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-
-                            Container(
-                              height: 150,
-                              width: _width,
-                              child: MediaQuery.removePadding(
-                                context: context, 
-                                removeTop: true,
-                                removeBottom: true,
-                                child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: _relatedFilmList
-                                )
-                              ),
-                            ),
-
-
-
                             SizedBox(height: 50,)
                         
                         ],
                       ),
-                      
-
-
                     ),
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  relatedMovieClick(Film film) async {
-    print("click");
-    setState(() {
-      _loading = true;
-    });
-    await new Future.delayed(const Duration(seconds : 1));
-    setState(() {
-      _loading = false;
-      _film = film;
-    });
   }
 }

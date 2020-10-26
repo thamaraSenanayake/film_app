@@ -5,13 +5,14 @@ import 'package:film_app/const.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/module/gridItem/gridTitle.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
-import 'package:film_app/profile/filmList.dart/filmList.dart';
-import 'package:film_app/profile/filmList.dart/filmListFavourite.dart';
-import 'package:film_app/profile/filmList.dart/filmListSearch.dart';
+import 'package:film_app/profile/filmList/filmList.dart';
+import 'package:film_app/profile/filmList/filmListFavourite.dart';
+import 'package:film_app/profile/filmList/filmListSearch.dart';
 import 'package:film_app/profile/settings.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
@@ -1380,6 +1381,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   reloadFilms() {
     _loadFilms();
+  }
+
+  @override
+  gridItemTVSerriesListener(TvSeries tvSeries) {
+    
   }
 }
 

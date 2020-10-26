@@ -2,6 +2,7 @@ import 'package:awesome_loader/awesome_loader.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/film.dart';
+import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
@@ -650,6 +651,11 @@ class _FilmListState extends State<FilmList> implements GridItemListner{
 
   @override
   gridItemTitleClick(FilmListCategery filmListCategery) {
+    
+  }
+
+  @override
+  gridItemTVSerriesListener(TvSeries tvSeries) {
     
   }
 }
