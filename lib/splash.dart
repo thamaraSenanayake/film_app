@@ -22,9 +22,11 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
-    // _profile = null;
-    // _loading = false;
-    _loadingTime();
+    //!
+    _profile = null;
+    _loading = false;
+    //_loadingTime();
+    //!
     _getSystemData();
   }
 

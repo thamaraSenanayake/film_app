@@ -84,6 +84,9 @@ class Database{
           );
         }
       }
+
+      
+
       film = Film(
         name:item["name"],
         year:item["year"],
@@ -95,7 +98,7 @@ class Database{
         id:item["id"],
         videoUrl: item["videoUrl"],
         filmUrl: item["filmUrl"],
-        commentList: commentList
+        commentList: commentList,
       );
       filmList.add(film);
     }
@@ -123,12 +126,13 @@ class Database{
           );
         }
       }
-      if(item["episode"] != null){
-        for (var item in item["episode"]) {
+
+      if(item["episodeList"] != null){
+        for (var item in item["episodeList"]) {
           episodeList.add(
             Episode(
               seasonName: item["seasonName"],
-              epiUrl: item["name"].epiUrl(),
+              epiUrl: item["epiUrl"],
             )
           );
         }
@@ -142,7 +146,8 @@ class Database{
         lanuage:filmListCategoryConvert(item["lanuage"]),
         id:item["id"],
         videoUrl: item["videoUrl"],
-        commentList: commentList
+        commentList: commentList,
+        episodeList: episodeList
       );
       tvSeriesList.add(tvSeries);
     }
@@ -187,6 +192,25 @@ class Database{
 
   }
 
+  Future<int> getTvSeriesCount() async{
+    int tvSeriesCount = 0;
+
+    await systemData.document('tvSeriesCount').get().then((document){
+      tvSeriesCount = document['count'];
+    });
+
+    return tvSeriesCount;
+
+  }
+
+  Future setTvSeriesCount(int tvSeriesCount) async{
+
+    await systemData.document('tvSeriesCount').updateData({
+      "count":tvSeriesCount
+    });
+
+  }
+
   Future addFilm(Film film) async {
     int filmCount = await getFilmCount();
     String key;
@@ -216,8 +240,46 @@ class Database{
       "search":searchText
     });
     
+  }
 
-  
+  Future addTvSeries(TvSeries tvSeries) async {
+    int tvSeriesCount = await getTvSeriesCount();
+    String key;
+    List<String> searchText = [];
+    String searchTextValue ="";
+
+    key=tvSeries.name.toLowerCase();
+
+    for (var i = 0; i < key.length; i++) {
+      searchTextValue += key[i];
+      searchText.add(searchTextValue);
+    }
+
+    List<Map<String,dynamic>> episodeListMap =[];
+    for (var item in tvSeries.episodeList) {
+      episodeListMap.add(
+        {
+          "seasonName": item.seasonName,
+          "epiUrl": item.epiUrl,
+        }
+      );
+    }
+    
+
+    await tvSeriesCollection.document((++tvSeriesCount).toString()).setData({
+      "name":tvSeries.name,
+      "year":tvSeries.year,
+      "imgUrl":tvSeries.imgUrl,
+      "ratings":tvSeries.ratings,
+      "description":tvSeries.description,
+      "lanuage":tvSeries.lanuage.toString(),
+      "id":tvSeriesCount,
+      "videoUrl":tvSeries.videoUrl,
+      "search":searchText,
+      "episodeList":episodeListMap
+    });
+    
+    await setTvSeriesCount(tvSeriesCount);
   }
 
   Future<bool> addComment(List<Comment> commentList ,String id) async{

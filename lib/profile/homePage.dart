@@ -4,6 +4,7 @@ import 'package:fancy_drawer/fancy_drawer.dart';
 import 'package:film_app/const.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
+import 'package:film_app/model/episode.dart';
 import 'package:film_app/model/film.dart';
 import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
@@ -14,6 +15,7 @@ import 'package:film_app/profile/filmList/filmList.dart';
 import 'package:film_app/profile/filmList/filmListFavourite.dart';
 import 'package:film_app/profile/filmList/filmListSearch.dart';
 import 'package:film_app/profile/settings.dart';
+import 'package:film_app/profile/tvSericesList/tvSeriesList.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -83,7 +85,49 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _hintDisplay();
     });
 
-  
+    // _addTvSerices();
+  }
+
+  _addTvSerices(){
+    List<Episode> epiList = [];
+    epiList.add(
+      Episode(
+        seasonName:"season one",
+        epiUrl:"https://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns",
+      )
+    );
+    epiList.add(
+      Episode(
+        seasonName:"season one",
+        epiUrl:"https://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns",
+      )
+    );
+    epiList.add(
+      Episode(
+        seasonName:"season one",
+        epiUrl:"https://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns",
+      )
+    );
+    epiList.add(
+      Episode(
+        seasonName:"season Two",
+        epiUrl:"https://stackoverflow.com/questions/734689/sqlite-primary-key-on-multiple-columns",
+      )
+    );
+
+
+    TvSeries tvSeries = TvSeries(
+      name:"The Witcher",
+      year:"2019",
+      imgUrl:"https://m.media-amazon.com/images/M/MV5BOGE4MmVjMDgtMzIzYy00NjEwLWJlODMtMDI1MGY2ZDlhMzE2XkEyXkFqcGdeQXVyMzY0MTE3NzU@._V1_UX182_CR0,0,182,268_AL_.jpg",
+      ratings:7.8,
+      description:"Geralt of Rivia, a solitary monster hunter, struggles to find his place in a world where people often prove more wicked than beasts.",
+      lanuage:FilmListCategery.English,
+      videoUrl:"https://www.youtube.com/watch?v=ndl1W4ltcmg",
+      episodeList:epiList,
+    );
+
+    database.addTvSeries(tvSeries);
   }
 
   _hintDisplay() async {
@@ -1035,8 +1079,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                   onTap: (){
                                                     Navigator.of(context).push(
                                                       PageRouteBuilder(
-                                                        pageBuilder: (context, _, __) => FilmList(
-                                                          filmListCategery: FilmListCategery.TvSeries,
+                                                        pageBuilder: (context, _, __) => TvSeriesList(
                                                           listener: this,
                                                         ),
                                                         opaque: false

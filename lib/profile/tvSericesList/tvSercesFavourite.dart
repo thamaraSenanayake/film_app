@@ -37,7 +37,7 @@ class _TvSeriesFavoriteState extends State<TvSeriesFavorite> implements GridItem
     _tvSeries = [];
     List<Widget> _tvSeriesWidgetTemp =[]; 
     
-    _tvSeries = await DBProvider.db.favoriteTvSerriesList(MainType.Film);
+    _tvSeries = await DBProvider.db.favoriteTvSerriesList();
 
     for (var item in _tvSeries) {
       _tvSeriesWidgetTemp.add(

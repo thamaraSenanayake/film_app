@@ -25,8 +25,8 @@ class _TvSeriesSearchState extends State<TvSeriesSearch> implements GridItemList
   double _height = 0.0;
   double _width = 0.0;
   bool _loading = true;
-  List<Widget> _filmListWidget =[];
-  List<Film> _filmList = [];
+  List<Widget> _tvSeriesListWidget =[];
+  List<TvSeries> _tvSeries = [];
   Database _database;
 
   @override
@@ -37,24 +37,21 @@ class _TvSeriesSearchState extends State<TvSeriesSearch> implements GridItemList
   }
 
   _loadFilms() async{
-    _filmList = [];
-    List<Widget> _filmListWidgetTemp =[]; 
+    _tvSeries = [];
+    List<Widget> _tvSeriesWidgetTemp =[]; 
 
-    if(widget.category == null || widget.category == FilmListCategery.NewlyAdd){
-      _filmList = await _database.searchAll(widget.searchKey);
-    }else{
-      _filmList = await _database.searchLanguage(widget.searchKey,widget.category);
-    }
+    
+     _tvSeries = await _database.allTvSeriesSearch(widget.searchKey);
     
 
-    for (var item in _filmList) {
-      _filmListWidgetTemp.add(
-        GridItem(film: item, gridItemListener: this, index: _filmList.indexOf(item))
+    for (var item in _tvSeries) {
+      _tvSeriesWidgetTemp.add(
+        GridItem(film: null, tvSeries: item, gridItemListener: this, index: _tvSeries.indexOf(item))
       );
     }
     
     setState(() {
-      _filmListWidget = _filmListWidgetTemp;
+      _tvSeriesListWidget = _tvSeriesWidgetTemp;
       _loading = false;
     });
 
@@ -168,32 +165,11 @@ class _TvSeriesSearchState extends State<TvSeriesSearch> implements GridItemList
                           crossAxisSpacing: 0,
                           mainAxisSpacing: 0,
                           crossAxisCount: 2,
-                          children: _filmListWidget
+                          children: _tvSeriesListWidget
                         ),
                       ),
                     ),
                     
-                    // Container(
-                    //           height: 50,
-                    //           width: _width,
-                    //           child: Align(
-                    //             alignment: Alignment.centerRight,
-                    //             child: Container(
-                    //               decoration: BoxDecoration(
-                    //                 shape: BoxShape.circle,
-                    //                 color: ColorList.Red
-                    //               ),
-                    //               child: Padding(
-                    //                 padding: EdgeInsets.all(4),
-                    //                 child: Icon(
-                    //                   Icons.arrow_forward,
-                    //                   color: ColorList.Black,
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         )
-
                   ],
                 )
               ),

@@ -7,6 +7,7 @@ import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
 import 'package:film_app/profile/tvSericesList/tvserciesSearch.dart';
+import 'package:film_app/profile/tvSeriesDetails/tvSeriesDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -34,6 +35,7 @@ class _FilmListState extends State<TvSeriesList> implements GridItemListner{
   FilmListCategery categery;
 
   _search(){
+    FocusScope.of(context).unfocus();
     if(_searchController.text.isNotEmpty){
       Navigator.of(context).push(
         PageRouteBuilder(
@@ -449,6 +451,14 @@ class _FilmListState extends State<TvSeriesList> implements GridItemListner{
 
   @override
   gridItemTVSerriesListener(TvSeries tvSeries) {
-    
+    DBProvider.db.addRecentlyViewTvSeries(tvSeries); 
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, _, __) => TvSeriesDetails(
+          tvSeries: tvSeries,
+        ),
+        opaque: false
+      ),
+    );
   }
 }

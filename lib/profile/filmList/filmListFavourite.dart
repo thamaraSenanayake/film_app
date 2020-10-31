@@ -6,6 +6,7 @@ import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/gridItem/girditemListner.dart';
 import 'package:film_app/module/gridItem/gridItem.dart';
 import 'package:film_app/profile/filmDetails/filmDetails.dart';
+import 'package:film_app/profile/tvSeriesDetails/tvSeriesDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -25,6 +26,8 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
   bool _loading = true;
   List<Widget> _filmListWidget =[];
   List<Film> _filmList = [];
+  List<Widget> _tvSeriesListWidget =[];
+  List<TvSeries> _tvSeriesList = [];
 
 
   @override
@@ -36,17 +39,47 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
   _loadFilms() async{
     _filmList = [];
     List<Widget> _filmListWidgetTemp =[]; 
+    List<Widget> _tvSeriesListWidgetTemp = [];
     
     _filmList = await DBProvider.db.favoriteList(MainType.Film);
+    _tvSeriesList = await DBProvider.db.favoriteTvSerriesList();
+    _filmListWidgetTemp.add(
+      Text(
+        "Favorite Films",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 25
+        ),
+      )
+    );
 
     for (var item in _filmList) {
       _filmListWidgetTemp.add(
         GridItem(film: item, gridItemListener: this, index: _filmList.indexOf(item))
       );
     }
+
+    _tvSeriesListWidgetTemp.add(
+      Text(
+        "Favorite TV Series",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 25
+        ),
+      )
+    );
+
+    for (var item in _tvSeriesList) {
+      _tvSeriesListWidgetTemp.add(
+        GridItem(film: null,tvSeries: item, gridItemListener: this, index: _tvSeriesList.indexOf(item))
+      );
+    }
     
     setState(() {
       _filmListWidget = _filmListWidgetTemp;
+      _tvSeriesListWidget =  _tvSeriesListWidgetTemp;
       _loading = false;
     });
 
@@ -97,7 +130,7 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         child: Text(
-                          "Favorite Movie",
+                          "Favorites",
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.w800,
@@ -139,39 +172,47 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
                     Container(
                       height: _height -190,
                       width: _width,
-                      child: AnimationLimiter(
-                        child: GridView.count(
-                          
-                          primary: false,
-                          // padding: const EdgeInsets.all(20),
-                          crossAxisSpacing: 0,
-                          mainAxisSpacing: 0,
-                          crossAxisCount: 2,
-                          children: _filmListWidget
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            Container(
+                              height: _height -190,
+                              width: _width,
+                              child: AnimationLimiter(
+                                child: GridView.count(
+                                  
+                                  primary: false,
+                                  // padding: const EdgeInsets.all(20),
+                                  crossAxisSpacing: 0,
+                                  mainAxisSpacing: 0,
+                                  crossAxisCount: 2,
+                                  children: _filmListWidget
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: _height -190,
+                              width: _width,
+                              child: AnimationLimiter(
+                                child: GridView.count(
+                                  
+                                  primary: false,
+                                  // padding: const EdgeInsets.all(20),
+                                  crossAxisSpacing: 0,
+                                  mainAxisSpacing: 0,
+                                  crossAxisCount: 2,
+                                  children: _tvSeriesListWidget
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                     
-                    // Container(
-                    //           height: 50,
-                    //           width: _width,
-                    //           child: Align(
-                    //             alignment: Alignment.centerRight,
-                    //             child: Container(
-                    //               decoration: BoxDecoration(
-                    //                 shape: BoxShape.circle,
-                    //                 color: ColorList.Red
-                    //               ),
-                    //               child: Padding(
-                    //                 padding: EdgeInsets.all(4),
-                    //                 child: Icon(
-                    //                   Icons.arrow_forward,
-                    //                   color: ColorList.Black,
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         )
 
                   ],
                 )
@@ -204,6 +245,13 @@ class _FilmListFavoriteState extends State<FilmListFavorite> implements GridItem
 
   @override
   gridItemTVSerriesListener(TvSeries tvSeries) {
-    
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, _, __) => TvSeriesDetails(
+          tvSeries: tvSeries,
+        ),
+        opaque: false
+      ),
+    );
   }
 }

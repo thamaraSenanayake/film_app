@@ -266,26 +266,26 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                               
                               child: Stack(
                                 children: <Widget>[
-                                  Container(
-                                    width:_width,
-                                    height: 200,
-                                    color: Colors.indigo,
-                                    child: YoutubePlayer(
-                                      controller: _controller,
-                                      showVideoProgressIndicator: true,
-                                      progressColors: ProgressBarColors(
-                                        playedColor: ColorList.Red,
-                                        bufferedColor:ColorList.Black,
-                                        backgroundColor: ColorList.Black
-                                      ),
-                                      bottomActions: <Widget>[
-                                      ],
-                                      topActions: <Widget>[],
-                                      onReady: () {
-                                          // _controller.addListener(listener);
-                                      },
-                                    ),
-                                  ),
+                                  // Container(
+                                  //   width:_width,
+                                  //   height: 200,
+                                  //   color: Colors.indigo,
+                                  //   child: YoutubePlayer(
+                                  //     controller: _controller,
+                                  //     showVideoProgressIndicator: true,
+                                  //     progressColors: ProgressBarColors(
+                                  //       playedColor: ColorList.Red,
+                                  //       bufferedColor:ColorList.Black,
+                                  //       backgroundColor: ColorList.Black
+                                  //     ),
+                                  //     bottomActions: <Widget>[
+                                  //     ],
+                                  //     topActions: <Widget>[],
+                                  //     onReady: () {
+                                  //         // _controller.addListener(listener);
+                                  //     },
+                                  //   ),
+                                  // ),
 
                                   Padding(
                                     padding: const EdgeInsets.only(left:8.0),
@@ -349,7 +349,7 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                       height: 100,
                                       width: _width - 158,
                                       child: Padding(
-                                        padding: const EdgeInsets.only(top:5.0),
+                                        padding: const EdgeInsets.only(top:3.0),
                                         child: Column(
                                           children: <Widget>[
                                             Text(
@@ -362,6 +362,8 @@ class _FilmDetailsState extends State<FilmDetails> implements RelatedMovieListen
                                                 letterSpacing: 1.5
                                               ),
                                               textAlign: TextAlign.center,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                             Row(
                                               children: <Widget>[

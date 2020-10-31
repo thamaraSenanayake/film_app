@@ -36,6 +36,8 @@ class _GridItemState extends State<GridItem> {
             onTap: (){
               if(widget.film != null){
                 widget.gridItemListener.gridItemListner(widget.film);
+              }else{
+                widget.gridItemListener.gridItemTVSerriesListener(widget.tvSeries);
               }
             },
             child: Container(

@@ -3,8 +3,10 @@ import 'package:film_app/auth.dart';
 import 'package:film_app/database/databse.dart';
 import 'package:film_app/database/localDb.dart';
 import 'package:film_app/model/comment.dart';
+import 'package:film_app/model/episode.dart';
 import 'package:film_app/model/tvSerices.dart';
 import 'package:film_app/module/comment/commetView.dart';
+import 'package:film_app/module/episode/episodeView.dart';
 import 'package:film_app/profile/filmDetails/fullScreenVideo.dart';
 import 'package:film_app/res/typeConvert.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../const.dart';
+import 'episodeView.dart';
 
 class TvSeriesDetails extends StatefulWidget {
   final TvSeries tvSeries;
@@ -23,10 +26,11 @@ class TvSeriesDetails extends StatefulWidget {
   _TvSeriesStateDetails createState() => _TvSeriesStateDetails();
 }
 
-class _TvSeriesStateDetails extends State<TvSeriesDetails> {
+class _TvSeriesStateDetails extends State<TvSeriesDetails> implements EpisodeViewController {
   double _height = 0.0;
   double _width = 0.0;
   List<Widget> _commentListWidget = [];
+  List<Widget> _seasonListWidget = [];
   List<Comment> _commentList = [];
   final _commentController = TextEditingController();
   Database database = Database();
@@ -57,6 +61,35 @@ class _TvSeriesStateDetails extends State<TvSeriesDetails> {
       ),
     );
     _loadData();
+    _loadEpisode();
+  }
+
+  _loadEpisode(){
+    String _currentSeason ="";
+    if(_tvSeries.episodeList.length > 0){
+      _currentSeason = _tvSeries.episodeList[0].seasonName;
+      List<Episode> episodeList = [];
+      print(_tvSeries.episodeList.length);
+      for (var item in _tvSeries.episodeList) {
+        if (item.seasonName != _currentSeason) {
+          _seasonListWidget.add(
+            EpisodeView(episodeLit: episodeList, controller: this)
+          );
+          _currentSeason = item.seasonName;
+          episodeList =[];
+        }
+        episodeList.add(item);
+        
+      }
+      if(episodeList.length != 0){
+        _seasonListWidget.add(
+          EpisodeView(episodeLit: episodeList, controller: this)
+        );
+      }
+    }
+    setState(() {
+      
+    });
   }
 
   _loadData() async {
@@ -247,26 +280,26 @@ class _TvSeriesStateDetails extends State<TvSeriesDetails> {
                               
                               child: Stack(
                                 children: <Widget>[
-                                  Container(
-                                    width:_width,
-                                    height: 200,
-                                    color: Colors.indigo,
-                                    child: YoutubePlayer(
-                                      controller: _controller,
-                                      showVideoProgressIndicator: true,
-                                      progressColors: ProgressBarColors(
-                                        playedColor: ColorList.Red,
-                                        bufferedColor:ColorList.Black,
-                                        backgroundColor: ColorList.Black
-                                      ),
-                                      bottomActions: <Widget>[
-                                      ],
-                                      topActions: <Widget>[],
-                                      onReady: () {
-                                          // _controller.addListener(listener);
-                                      },
-                                    ),
-                                  ),
+                                  // Container(
+                                  //   width:_width,
+                                  //   height: 200,
+                                  //   color: Colors.indigo,
+                                  //   child: YoutubePlayer(
+                                  //     controller: _controller,
+                                  //     showVideoProgressIndicator: true,
+                                  //     progressColors: ProgressBarColors(
+                                  //       playedColor: ColorList.Red,
+                                  //       bufferedColor:ColorList.Black,
+                                  //       backgroundColor: ColorList.Black
+                                  //     ),
+                                  //     bottomActions: <Widget>[
+                                  //     ],
+                                  //     topActions: <Widget>[],
+                                  //     onReady: () {
+                                  //         // _controller.addListener(listener);
+                                  //     },
+                                  //   ),
+                                  // ),
 
                                   Padding(
                                     padding: const EdgeInsets.only(left:8.0),
@@ -417,6 +450,10 @@ class _TvSeriesStateDetails extends State<TvSeriesDetails> {
                               ),
                             ),
 
+                            
+                            Column(
+                              children: _seasonListWidget,
+                            ),
 
                             Padding(
                               padding: EdgeInsets.only(left: 10,top:20),
@@ -509,6 +546,24 @@ class _TvSeriesStateDetails extends State<TvSeriesDetails> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  @override
+  episodeClick(Episode episode,String epiName) {
+    Episode epi = Episode(
+      seasonName:episode.seasonName,
+      epiUrl:episode.epiUrl,
+      epiName:epiName,
+    );
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, _, __) => EpisodeViewDownload(
+          episode: epi, 
+          tvSeriesName: widget.tvSeries.name,
+        ),
+        opaque: false
       ),
     );
   }

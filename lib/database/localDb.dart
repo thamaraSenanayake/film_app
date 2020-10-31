@@ -42,8 +42,8 @@ class DBProvider {
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("CREATE TABLE Film ("
-          "id INTEGER PRIMARY KEY,"
-          "type TEXT PRIMARY KEY,"
+          "id INTEGER,"
+          "type TEXT,"
           "name TEXT NOT NULL,"
           "year TEXT NOT NULL,"
           "imgUrl TEXT NOT NULL,"
@@ -55,7 +55,8 @@ class DBProvider {
           "timeStampRecently INTEGER,"
           "timeStampFavorite INTEGER,"
           "recentFilm INTEGER,"
-          "likedFilm INTEGER"
+          "likedFilm INTEGER,"
+          "PRIMARY KEY (id, type)"
           ")");
     });
   }
@@ -67,7 +68,7 @@ class DBProvider {
     
 
     try {
-      await db.execute("UPDATE `Film` SET `likedFilm`=1, `timeStampFavorite` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+id.toString()+"and type ="+type.toString());
+      await db.execute("UPDATE `Film` SET `likedFilm`=1, `timeStampFavorite` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+id.toString()+" and type ='"+type.toString()+"'");
     } catch (e) {
       print(e);
       return e.toString();
@@ -82,7 +83,7 @@ class DBProvider {
     int count = 0; 
 
     try {
-      var res = await db.rawQuery("Select * from Film where id=" +film.id.toString()+"and type = "+MainType.Film.toString());
+      var res = await db.rawQuery("Select * from Film where id=" +film.id.toString()+ " and type = '"+MainType.Film.toString()+"'");
       count = res.length;
       
     } catch (e) {
@@ -121,7 +122,60 @@ class DBProvider {
               ")"
         );
       }else{
-        await db.execute("UPDATE `Film` SET `recentFilm`=1, `timeStampRecently` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+film.id.toString()+" and type ="+MainType.Film.toString());
+        await db.execute("UPDATE `Film` SET `recentFilm`=1, `timeStampRecently` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+film.id.toString()+" and type ='"+MainType.Film.toString()+"'");
+      }
+    } catch (e) {
+      print(e);
+      return e.toString();
+    }
+
+    return res;
+  }
+
+  addRecentlyViewTvSeries(TvSeries tvSeries) async {
+    final db = await database;
+    var res = 'done';
+    int count = 0; 
+
+    try {
+      var res = await db.rawQuery("Select * from Film where id=" +tvSeries.id.toString()+" and type = '"+MainType.TvSeries.toString()+"'");
+      count = res.length;
+      
+    } catch (e) {
+      print(e.toString());
+      // return e.toString();
+    }
+
+    try {
+      if(count == 0){
+        await db.execute(
+          "INSERT INTO `Film`( `id`,`type`,`name`,`year`,`imgUrl`,`ratings`,`description`,`genaric`,`lanuage`,`videoUrl`,`timeStampRecently`,`recentFilm`,`likedFilm`) VALUES (" +
+              tvSeries.id.toString()+
+              ",'" +
+              MainType.TvSeries.toString()+
+              "','" +
+              tvSeries.name+
+              "','" +
+              tvSeries.year+
+              "','" +
+              tvSeries.imgUrl+
+              "','" +
+              tvSeries.ratings.toString()+
+              "','" +
+              tvSeries.description.replaceAll('\'', "")+
+              "','','" +
+              tvSeries.lanuage.toString()+
+              "','" +
+              tvSeries.videoUrl+
+              "'," +
+              DateTime.now().millisecondsSinceEpoch.toString()+
+              "," +
+              "1,"+
+              "0"+
+              ")"
+        );
+      }else{
+        await db.execute("UPDATE `Film` SET `recentFilm`=1, `timeStampRecently` = "+DateTime.now().millisecondsSinceEpoch.toString()+" WHERE `id` = "+tvSeries.id.toString()+" and type ='"+MainType.TvSeries.toString()+"'");
       }
     } catch (e) {
       print(e);
@@ -152,7 +206,7 @@ class DBProvider {
     int count = 0; 
 
     try {
-      var res = await db.rawQuery("Select * from Film where id=" +id.toString()+" and likedFilm =1 and type="+type.toString());
+      var res = await db.rawQuery("Select * from Film where id=" +id.toString()+" and likedFilm =1 and type='"+type.toString()+"'");
       count = res.length;
       
     } catch (e) {
@@ -173,7 +227,7 @@ class DBProvider {
     final db = await database;
 
     try {
-      var res = await db.rawQuery("Select * from film where recentFilm= 1 and type="+MainType.Film.toString()+" order by timeStampRecently desc");
+      var res = await db.rawQuery("Select * from film where recentFilm= 1 and type='"+MainType.Film.toString()+"' order by timeStampRecently desc");
       for (var item in res) {
         filmList.add(
           Film(
@@ -201,7 +255,7 @@ class DBProvider {
     final db = await database;
 
     try {
-      var res = await db.rawQuery("Select * from film where mainType ="+mainType.toString()+" and likedFilm= 1 order by timeStampFavorite desc");
+      var res = await db.rawQuery("Select * from film where type ='"+mainType.toString()+"' and likedFilm= 1 order by timeStampFavorite desc");
       for (var item in res) {
         filmList.add(
           Film(
@@ -224,12 +278,12 @@ class DBProvider {
     return filmList;
   }
 
-  Future<List<TvSeries>> favoriteTvSerriesList(MainType mainType) async {
+  Future<List<TvSeries>> favoriteTvSerriesList() async {
     List<TvSeries> tvSeriesList = [];
     final db = await database;
 
     try {
-      var res = await db.rawQuery("Select * from film where mainType ="+mainType.toString()+" and likedFilm= 1 order by timeStampFavorite desc");
+      var res = await db.rawQuery("Select * from film where type ='"+MainType.TvSeries.toString()+"' and likedFilm= 1 order by timeStampFavorite desc");
       for (var item in res) {
         tvSeriesList.add(
           TvSeries(
