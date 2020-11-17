@@ -47,6 +47,7 @@ dependencies:
   path_provider: ^1.6.18
   launch_review: ^2.0.0
   share: ^0.6.4+3
+  firebase_messaging: ^6.0.16
 
 
 
